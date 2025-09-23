@@ -1,5 +1,3 @@
-_G.Color = Color3.fromRGB(239, 68, 68)
-_G.BGColor = Color3.fromRGB(18, 18, 18)
 -- Random string generator
 local function randomString(length)
     local chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -13,16 +11,12 @@ end
 
 -- Anti-detection measures
 local randomUI = randomString(12)
-
--- Store the random name in a global variable so we can reference it later
 _G.CurrentUIName = randomUI
-
--- Clean up existing UIs - FIXED VERSION
+-- Clean up existing UIs
 local function SafeDestroyUI()
     pcall(function()
         local containers = {game:GetService("CoreGui")}
         
-        -- Add gethui container if available
         if gethui then
             local altGui = gethui()
             if altGui and altGui ~= game:GetService("CoreGui") then
@@ -32,20 +26,8 @@ local function SafeDestroyUI()
         
         for _, container in pairs(containers) do
             for _, gui in pairs(container:GetChildren()) do
-                -- Clean up any UI that might be ours (check for attributes or specific patterns)
-                if gui:IsA("ScreenGui") then
-                    -- Method 1: Check if it has our secure attribute
-                    if gui:GetAttribute("SecureUI") then
-                        gui:Destroy()
-                    end
-                    -- Method 2: Clean up old ProjectWD name
-                    elseif gui.Name == "ProjectWD" then
-                        gui:Destroy()
-                    end
-                    -- Method 3: Clean up any UI with similar size/characteristics
-                    elseif gui:FindFirstChild("Main") and gui.Main:IsA("Frame") then
-                        gui:Destroy()
-                    end
+                if gui:IsA("ScreenGui") and (gui.Name == "ProjectWD" or gui:GetAttribute("SecureUI")) then
+                    gui:Destroy()
                 end
             end
         end
@@ -54,43 +36,33 @@ end
 
 SafeDestroyUI()
 
--- Wait for game to load
 if not game:IsLoaded() then game.Loaded:Wait() end
 task.wait(1)
 
--- Secure UI creation function
+-- Secure UI creation
 local function GetProtectedGui()
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = randomUI
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ScreenGui.ResetOnSpawn = false
     
-    -- Apply protection methods
     if syn and syn.protect_gui then
         syn.protect_gui(ScreenGui)
     end
     
-    if protectgui then
-        protectgui(ScreenGui)
-    end
-    
-    -- Use gethui() or protected CoreGui
-    local parentContainer
-    if gethui then
-        parentContainer = gethui()
-    else
-        parentContainer = cloneref and cloneref(game:GetService("CoreGui")) or game:GetService("CoreGui")
-    end
-    
+    local parentContainer = gethui and gethui() or game:GetService("CoreGui")
     ScreenGui.Parent = parentContainer
-    ScreenGui:SetAttribute("SecureUI", true)  -- Mark it as ours
-    ScreenGui:SetAttribute("UIName", randomUI)  -- Store the random name
+    ScreenGui:SetAttribute("SecureUI", true)
     
     return ScreenGui
 end
 
 
 
+_G.Color = Color3.fromRGB(239, 68, 68)
+_G.BGColor = Color3.fromRGB(18, 18, 18)
+_G.Color = Color3.fromRGB(239, 68, 68)
+_G.BGColor = Color3.fromRGB(18, 18, 18)
 IKAI = true
 if IKAI then
     do
@@ -347,7 +319,7 @@ if IKAI then
         local TweenService = game:GetService("TweenService")
 
         -- Main UI
-        local RippleHUBLIB = Instance.new("ScreenGui")
+        local RippleHUBLIB = GetProtectedGui()
         RippleHUBLIB.Name = _G.CurrentUIName
         RippleHUBLIB.Parent = GetProtectedGui()
         RippleHUBLIB.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
