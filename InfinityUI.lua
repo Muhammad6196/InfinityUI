@@ -292,7 +292,7 @@ if IKAI then
         Name.Position = UDim2.new(0, 20, 0, 0)
         Name.Size = UDim2.new(0, 200, 1, 0)
         Name.Font = Enum.Font.GothamSemibold
-        Name.Text = "My Hub"
+        Name.Text = text
         Name.TextColor3 = _G.Color
         Name.TextSize = 16
         Name.TextXAlignment = Enum.TextXAlignment.Left
