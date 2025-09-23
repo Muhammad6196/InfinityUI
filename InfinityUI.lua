@@ -249,7 +249,7 @@ if IKAI then
         local abc = false
         local logo = logo or 0
         local currentpage = ""
-        local keybind = keybind or Enum.KeyCode.RightControl
+        local keybind = keybind or Enum.KeyCode.LeftControl
         local yoo = string.gsub(tostring(keybind), "Enum.KeyCode.", "")
         
         local UserInputService = game:GetService("UserInputService")
@@ -843,6 +843,7 @@ if IKAI then
             function main:Dropdown(text, old, option, mode, callback)
                 local isdropping = false
                 local selections = {}
+                
                 local isMulti = (string.lower(mode) == "multi")
                 local items = {}
                 local allOptions = option
@@ -967,7 +968,7 @@ if IKAI then
                             DropTitle.Text = text .. " : "
                         end
                     else
-                        DropTitle.Text = text .. " : " .. (selections or "")
+                        DropTitle.Text = text .. " : " .. selections[1]
                     end
                 end
 
