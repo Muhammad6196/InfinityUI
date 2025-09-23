@@ -373,7 +373,7 @@ if IKAI then
             MiniFrame.BackgroundColor3 = _G.Color
             MiniFrame.Size = UDim2.new(0, 100, 0, 30)
             MiniFrame.Position = UDim2.new(0.5, -50, 0, 2) -- top center
-            MiniFrame.Text = "Infinity"
+            MiniFrame.Text = "Open Hub"
             MiniFrame.TextColor3 = Color3.fromRGB(255, 255, 255)
             MiniFrame.Font = Enum.Font.GothamBold
             MiniFrame.TextSize = 14
@@ -904,9 +904,10 @@ if IKAI then
                 DropImage.Name = "DropImage"
                 DropImage.Parent = Dropdown
                 DropImage.BackgroundTransparency = 1
-                DropImage.Position = UDim2.new(0, 420, 0, 4)
+                DropImage.Position = UDim2.new(0, 410, 0, 4)
                 DropImage.Rotation = -90
                 DropImage.Size = UDim2.new(0, 20, 0, 20)
+                DropImage.Image = 'rbxassetid://6031090990'
 
                 local DropButton = Instance.new("TextButton")
                 DropButton.Name = "DropButton"
