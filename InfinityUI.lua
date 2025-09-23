@@ -373,7 +373,7 @@ if IKAI then
             MiniFrame.BackgroundColor3 = _G.Color
             MiniFrame.Size = UDim2.new(0, 100, 0, 30)
             MiniFrame.Position = UDim2.new(0.5, -50, 0, 2) -- top center
-            MiniFrame.Text = "Open Hub"
+            MiniFrame.Text = "Infinity"
             MiniFrame.TextColor3 = Color3.fromRGB(255, 255, 255)
             MiniFrame.Font = Enum.Font.GothamBold
             MiniFrame.TextSize = 14
