@@ -1,5 +1,96 @@
 _G.Color = Color3.fromRGB(239, 68, 68)
 _G.BGColor = Color3.fromRGB(18, 18, 18)
+-- Random string generator
+local function randomString(length)
+    local chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    local str = ""
+    for i = 1, length do
+        local rand = math.random(1, #chars)
+        str = str .. string.sub(chars, rand, rand)
+    end
+    return str
+end
+
+-- Anti-detection measures
+local randomUI = randomString(12)
+
+-- Store the random name in a global variable so we can reference it later
+_G.CurrentUIName = randomUI
+
+-- Clean up existing UIs - FIXED VERSION
+local function SafeDestroyUI()
+    pcall(function()
+        local containers = {game:GetService("CoreGui")}
+        
+        -- Add gethui container if available
+        if gethui then
+            local altGui = gethui()
+            if altGui and altGui ~= game:GetService("CoreGui") then
+                table.insert(containers, altGui)
+            end
+        end
+        
+        for _, container in pairs(containers) do
+            for _, gui in pairs(container:GetChildren()) do
+                -- Clean up any UI that might be ours (check for attributes or specific patterns)
+                if gui:IsA("ScreenGui") then
+                    -- Method 1: Check if it has our secure attribute
+                    if gui:GetAttribute("SecureUI") then
+                        gui:Destroy()
+                    end
+                    -- Method 2: Clean up old ProjectWD name
+                    elseif gui.Name == "ProjectWD" then
+                        gui:Destroy()
+                    end
+                    -- Method 3: Clean up any UI with similar size/characteristics
+                    elseif gui:FindFirstChild("Main") and gui.Main:IsA("Frame") then
+                        gui:Destroy()
+                    end
+                end
+            end
+        end
+    end)
+end
+
+SafeDestroyUI()
+
+-- Wait for game to load
+if not game:IsLoaded() then game.Loaded:Wait() end
+task.wait(1)
+
+-- Secure UI creation function
+local function GetProtectedGui()
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = randomUI
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ScreenGui.ResetOnSpawn = false
+    
+    -- Apply protection methods
+    if syn and syn.protect_gui then
+        syn.protect_gui(ScreenGui)
+    end
+    
+    if protectgui then
+        protectgui(ScreenGui)
+    end
+    
+    -- Use gethui() or protected CoreGui
+    local parentContainer
+    if gethui then
+        parentContainer = gethui()
+    else
+        parentContainer = cloneref and cloneref(game:GetService("CoreGui")) or game:GetService("CoreGui")
+    end
+    
+    ScreenGui.Parent = parentContainer
+    ScreenGui:SetAttribute("SecureUI", true)  -- Mark it as ours
+    ScreenGui:SetAttribute("UIName", randomUI)  -- Store the random name
+    
+    return ScreenGui
+end
+
+
+
 IKAI = true
 if IKAI then
     do
@@ -257,8 +348,8 @@ if IKAI then
 
         -- Main UI
         local RippleHUBLIB = Instance.new("ScreenGui")
-        RippleHUBLIB.Name = "ProjectWD"
-        RippleHUBLIB.Parent = game.CoreGui
+        RippleHUBLIB.Name = _G.CurrentUIName
+        RippleHUBLIB.Parent = GetProtectedGui()
         RippleHUBLIB.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
         local Main = Instance.new("Frame")
@@ -432,19 +523,11 @@ if IKAI then
             if input.KeyCode == Enum.KeyCode[yoo] then
                 if toggled == false then
                     toggled = true
-                    game:GetService("CoreGui"):FindFirstChild("ProjectWD").Enabled = false
+                    -- Use the random UI name instead of "ProjectWD"
+                    RippleHUBLIB.Enabled = false
                 else
                     toggled = false
-                    game:GetService("CoreGui"):FindFirstChild("ProjectWD").Enabled = true
-                end
-            end
-            if input.KeyCode == Enum.KeyCode.RightControl then
-                if toggled == false then
-                    toggled = true
-                    game:GetService("CoreGui"):FindFirstChild("ProjectWD").Enabled = false
-                else
-                    toggled = false
-                    game:GetService("CoreGui"):FindFirstChild("ProjectWD").Enabled = true
+                    RippleHUBLIB.Enabled = true
                 end
             end
         end)
