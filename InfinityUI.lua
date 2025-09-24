@@ -1023,7 +1023,7 @@ if IKAI then
                             DropTitle.Text = text .. " : "
                         end
                     else
-                        DropTitle.Text = text .. " : " .. selections[1]
+                        DropTitle.Text = text .. " : " .. selections
                     end
                 end
 
