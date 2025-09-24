@@ -1024,7 +1024,6 @@ if IKAI then
                             DropTitle.Text = text .. " : "
                         end
                     else
-                        print(selections)
                         DropTitle.Text = text .. " : " .. selections
                     end
                 end
