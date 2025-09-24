@@ -328,7 +328,7 @@ if IKAI then
         Main.Name = "Main"
         Main.Parent = RippleHUBLIB
         Main.AnchorPoint = Vector2.new(0.5, 0.5)
-        Main.BackgroundColor3 = _G.BGColor
+        Main.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
         Main.Position = UDim2.new(0.5, 0, 0.5, 0)
         Main.Size = UDim2.new(0, 600, 0, 300)
 
