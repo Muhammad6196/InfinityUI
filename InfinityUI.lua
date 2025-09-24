@@ -1008,7 +1008,6 @@ if IKAI then
                     if isMulti then
                         selections = typeof(old) == "table" and old or {old}
                     else
-                        print(old)
                         selections = old
                     end
                 end
