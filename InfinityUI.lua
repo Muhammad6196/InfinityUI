@@ -957,215 +957,298 @@ if IKAI then
                 UIPadding.PaddingBottom = UDim.new(0, 2)
 
                 local DropImage = Instance.new("ImageLabel")
-                DropImage.Name = "DropImage"
-                DropImage.Parent = Dropdown
-                DropImage.BackgroundTransparency = 1
-                DropImage.Position = UDim2.new(0, 410, 0, 4)
-                DropImage.Rotation = -90
-                DropImage.Size = UDim2.new(0, 20, 0, 20)
-                DropImage.Image = 'rbxassetid://6031090990'
+             function main:Dropdown(text, old, option, mode, callback)
+    local isdropping = false
+    local selections = {}
+    
+    local isMulti = (string.lower(mode) == "multi")
+    local items = {}
+    local allOptions = option
 
-                local DropButton = Instance.new("TextButton")
-                DropButton.Name = "DropButton"
-                DropButton.Parent = Dropdown
-                DropButton.BackgroundTransparency = 1
-                DropButton.Size = UDim2.new(0, 436, 0, 29)
-                DropButton.Text = ""
+    -- // UI Setup
+    local dropmain = Instance.new("Frame")
+    dropmain.Name = text
+    dropmain.Parent = MainFramePage
+    dropmain.BackgroundColor3 = _G.Color
+    dropmain.Size = UDim2.new(0, 442, 0, 31)
 
-                local Dropsearch = Instance.new("Frame")
-                Dropsearch.Name = "Drop_Search"
-                Dropsearch.Parent = Dropdown
-                Dropsearch.BackgroundColor3 = _G.Color
-                Dropsearch.Position = UDim2.new(0, 20, 0, 6)
-                Dropsearch.Size = UDim2.new(0, 65, 0, 18)
+    local UICornerdrop = Instance.new("UICorner")
+    UICornerdrop.CornerRadius = UDim.new(0, 5)
+    UICornerdrop.Parent = dropmain
 
-                local Dropsearchcor = Instance.new("UICorner")
-                Dropsearchcor.CornerRadius = UDim.new(0, 5)
-                Dropsearchcor.Parent = Dropsearch
+    local Dropdown = Instance.new("Frame")
+    Dropdown.Name = "Dropdown"
+    Dropdown.Parent = dropmain
+    Dropdown.BackgroundColor3 = _G.BGColor
+    Dropdown.ClipsDescendants = true
+    Dropdown.Size = UDim2.new(0, 436, 0, 29)
+    Dropdown.Position = UDim2.new(0, 3, 0, 1)
 
-                local TextBox = Instance.new("TextBox")
-                TextBox.Parent = Dropsearch
-                TextBox.BackgroundColor3 = _G.BGColor
-                TextBox.Position = UDim2.new(0, 1, 0, 1)
-                TextBox.Size = UDim2.new(0, 63, 0, 16)
-                TextBox.Font = Enum.Font.GothamSemibold
-                TextBox.TextColor3 = Color3.fromRGB(225, 225, 225)
-                TextBox.TextSize = 9
-                TextBox.Text = "Search"
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 5)
+    UICorner.Parent = Dropdown
 
-                local UICorner_2 = Instance.new("UICorner")
-                UICorner_2.CornerRadius = UDim.new(0, 5)
-                UICorner_2.Parent = TextBox
+    local DropTitle = Instance.new("TextLabel")
+    DropTitle.Name = "DropTitle"
+    DropTitle.Parent = Dropdown
+    DropTitle.BackgroundTransparency = 1
+    DropTitle.Size = UDim2.new(0, 436, 0, 29)
+    DropTitle.Font = Enum.Font.GothamSemibold
+    DropTitle.TextColor3 = Color3.fromRGB(225, 225, 225)
+    DropTitle.TextSize = 15
+    DropTitle.Text = text .. " : "
 
-                -- Auto resize Canvas
-                local function UpdateCanvasSize()
-                    DropScroll.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y + 4)
-                end
-                UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(UpdateCanvasSize)
+    local DropScroll = Instance.new("ScrollingFrame")
+    DropScroll.Name = "DropScroll"
+    DropScroll.Parent = Dropdown
+    DropScroll.Active = true
+    DropScroll.BackgroundTransparency = 1
+    DropScroll.BorderSizePixel = 0
+    DropScroll.Position = UDim2.new(0, 0, 0, 31)
+    DropScroll.Size = UDim2.new(0, 436, 0, 100)
+    DropScroll.ScrollBarThickness = 3
+    DropScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 
-                -- // Preselect
-                if old then
-                    if isMulti then
-                        selections = typeof(old) == "table" and old or {old}
-                    else
-                        selections = old
-                    end
-                end
+    local UIListLayout = Instance.new("UIListLayout")
+    UIListLayout.Parent = DropScroll
+    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-                -- // Update title
-                local function RefreshTitle()
-                    if isMulti then
-                        if #selections == 1 then
-                            DropTitle.Text = text .. " : " .. selections[1]
-                        elseif #selections > 1 then
-                            DropTitle.Text = text .. " : Various"
-                        else
-                            DropTitle.Text = text .. " : "
-                        end
-                    else
-                        DropTitle.Text = text .. " : " .. selections
-                    end
-                end
+    local UIPadding = Instance.new("UIPadding")
+    UIPadding.Parent = DropScroll
+    UIPadding.PaddingTop = UDim.new(0, 2)
+    UIPadding.PaddingBottom = UDim.new(0, 2)
 
-                local function RefreshVisuals()
-                    for _, item in pairs(items) do
-                        local v = item.Value
-                        local selected = isMulti and table.find(selections, v) or (selections == v)
+    local DropImage = Instance.new("ImageLabel")
+    DropImage.Name = "DropImage"
+    DropImage.Parent = Dropdown
+    DropImage.BackgroundTransparency = 1
+    DropImage.Position = UDim2.new(0, 410, 0, 4)
+    DropImage.Rotation = -90
+    DropImage.Size = UDim2.new(0, 20, 0, 20)
+    DropImage.Image = 'rbxassetid://6031090990'
 
-                        if selected then
-                            item.Button.TextColor3 = Color3.fromRGB(239, 68, 68)
-                            item.Button.TextTransparency = 0
-                        else
-                            item.Button.TextColor3 = Color3.fromRGB(200, 200, 200)
-                            item.Button.TextTransparency = 0.5
-                        end
-                    end
-                end
+    local DropButton = Instance.new("TextButton")
+    DropButton.Name = "DropButton"
+    DropButton.Parent = Dropdown
+    DropButton.BackgroundTransparency = 1
+    DropButton.Size = UDim2.new(0, 436, 0, 29)
+    DropButton.Text = ""
 
-                local function ClearUI()
-                    for _, v in ipairs(DropScroll:GetChildren()) do
-                        if v:IsA("TextButton") then v:Destroy() end
-                    end
-                    items = {}
-                    UpdateCanvasSize()
-                end
+    local Dropsearch = Instance.new("Frame")
+    Dropsearch.Name = "Drop_Search"
+    Dropsearch.Parent = Dropdown
+    Dropsearch.BackgroundColor3 = _G.Color
+    Dropsearch.Position = UDim2.new(0, 20, 0, 6)
+    Dropsearch.Size = UDim2.new(0, 65, 0, 18)
 
-                -- // Create Item
-                local function CreateItem(v)
-                    local Item = Instance.new("TextButton")
-                    Item.Name = "Item"
-                    Item.Parent = DropScroll
-                    Item.BackgroundTransparency = 1
-                    Item.Size = UDim2.new(0, 436, 0, 26)
-                    Item.Font = Enum.Font.GothamSemibold
-                    Item.Text = tostring(v)
-                    Item.TextColor3 = Color3.fromRGB(200, 200, 200)
-                    Item.TextSize = 13
-                    Item.TextTransparency = 0.5
-                    Item.ZIndex = 2
+    local Dropsearchcor = Instance.new("UICorner")
+    Dropsearchcor.CornerRadius = UDim.new(0, 5)
+    Dropsearchcor.Parent = Dropsearch
 
-                    local SelectedBG = Instance.new("Frame")
-                    SelectedBG.Parent = Item
-                    SelectedBG.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-                    SelectedBG.Size = UDim2.new(1, 0, 1, 0)
-                    SelectedBG.Visible = false
-                    SelectedBG.ZIndex = 1
+    local TextBox = Instance.new("TextBox")
+    TextBox.Parent = Dropsearch
+    TextBox.BackgroundColor3 = _G.BGColor
+    TextBox.Position = UDim2.new(0, 1, 0, 1)
+    TextBox.Size = UDim2.new(0, 63, 0, 16)
+    TextBox.Font = Enum.Font.GothamSemibold
+    TextBox.TextColor3 = Color3.fromRGB(225, 225, 225)
+    TextBox.TextSize = 9
+    TextBox.Text = "Search"
 
-                    local UICorner = Instance.new("UICorner")
-                    UICorner.CornerRadius = UDim.new(0, 4)
-                    UICorner.Parent = SelectedBG
+    local UICorner_2 = Instance.new("UICorner")
+    UICorner_2.CornerRadius = UDim.new(0, 5)
+    UICorner_2.Parent = TextBox
 
-                    Item.MouseButton1Click:Connect(function()
-                        if isMulti then
-                            local idx = table.find(selections, v)
-                            if idx then
-                                table.remove(selections, idx)
-                            else
-                                table.insert(selections, v)
-                            end
-                            callback(selections)
-                        else
-                            selections = v
-                            callback(selections)
-                            isdropping = false
-                            Dropdown:TweenSize(UDim2.new(0, 436, 0, 29), "Out", "Quad", 0.3, true)
-                            dropmain:TweenSize(UDim2.new(0, 442, 0, 31), "Out", "Quad", 0.3, true)
-                            DropImage.Rotation = -90
-                        end
-                        RefreshTitle()
-                        RefreshVisuals()
-                    end)
+    -- Auto resize Canvas
+    local function UpdateCanvasSize()
+        DropScroll.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y + 4)
+    end
+    UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(UpdateCanvasSize)
 
-                    table.insert(items, {Button = Item, SelectedBG = SelectedBG, Value = v})
-                    UpdateCanvasSize()
-                end
+    -- // Preselect
+    if old then
+        if isMulti then
+            selections = typeof(old) == "table" and old or {old}
+        else
+            selections = old
+        end
+    end
 
-                -- // Refresh options by filter
-                local function RefreshOptions(filter)
-                    ClearUI()
-                    for _, v in ipairs(allOptions) do
-                        if not filter or string.find(string.lower(v), string.lower(filter)) then
-                            CreateItem(v)
-                        end
-                    end
-                    RefreshVisuals()
-                end
-
-                -- // Search Hook
-                TextBox:GetPropertyChangedSignal("Text"):Connect(function()
-                    if TextBox.Text == "" or TextBox.Text == "Search" then
-                        RefreshOptions()
-                    else
-                        RefreshOptions(TextBox.Text)
-                    end
-                end)
-
-                -- // Initial
-                RefreshTitle()
-                RefreshOptions()
-
-                -- Toggle dropdown
-                DropButton.MouseButton1Click:Connect(function()
-                    if not isdropping then
-                        isdropping = true
-                        Dropdown:TweenSize(UDim2.new(0, 436, 0, 131), "Out", "Quad", 0.3, true)
-                        dropmain:TweenSize(UDim2.new(0, 442, 0, 133), "Out", "Quad", 0.3, true)
-                        DropImage.Rotation = 180
-                    else
-                        isdropping = false
-                        Dropdown:TweenSize(UDim2.new(0, 436, 0, 29), "Out", "Quad", 0.3, true)
-                        dropmain:TweenSize(UDim2.new(0, 442, 0, 31), "Out", "Quad", 0.3, true)
-                        DropImage.Rotation = -90
-                    end
-                end)
-
-                -- // Functions
-                local dropfunc = {}
-
-                function dropfunc:Set(val)
-                    if isMulti then
-                        selections = typeof(val) == "table" and val or {val}
-                    else
-                        selections = val
-                    end
-                    RefreshTitle()
-                    RefreshVisuals()
-                end
-
-                function dropfunc:Add(v)
-                    table.insert(allOptions, v)
-                    RefreshOptions()
-                end
-
-                function dropfunc:Clear()
-                    selections = isMulti and {} or nil
-                    RefreshTitle()
-                    ClearUI()
-                    allOptions = {}
-                end
-
-                return dropfunc
+    -- // Update title
+    local function RefreshTitle()
+        if isMulti then
+            if #selections == 1 then
+                DropTitle.Text = text .. " : " .. selections[1]
+            elseif #selections > 1 then
+                DropTitle.Text = text .. " : Various"
+            else
+                DropTitle.Text = text .. " : "
             end
+        else
+            DropTitle.Text = text .. " : " .. selections
+        end
+    end
+
+    local function RefreshVisuals()
+        for _, item in pairs(items) do
+            local v = item.Value
+            local selected = isMulti and table.find(selections, v) or (selections == v)
+
+            if selected then
+                item.Button.TextColor3 = Color3.fromRGB(239, 68, 68)
+                item.Button.TextTransparency = 0
+            else
+                item.Button.TextColor3 = Color3.fromRGB(200, 200, 200)
+                item.Button.TextTransparency = 0.5
+            end
+        end
+    end
+
+    local function ClearUI()
+        for _, v in ipairs(DropScroll:GetChildren()) do
+            if v:IsA("TextButton") then v:Destroy() end
+        end
+        items = {}
+        UpdateCanvasSize()
+    end
+
+    -- // Create Item
+    local function CreateItem(v)
+        local Item = Instance.new("TextButton")
+        Item.Name = "Item"
+        Item.Parent = DropScroll
+        Item.BackgroundTransparency = 1
+        Item.Size = UDim2.new(0, 436, 0, 26)
+        Item.Font = Enum.Font.GothamSemibold
+        Item.Text = tostring(v)
+        Item.TextColor3 = Color3.fromRGB(200, 200, 200)
+        Item.TextSize = 13
+        Item.TextTransparency = 0.5
+        Item.ZIndex = 2
+
+        local SelectedBG = Instance.new("Frame")
+        SelectedBG.Parent = Item
+        SelectedBG.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+        SelectedBG.Size = UDim2.new(1, 0, 1, 0)
+        SelectedBG.Visible = false
+        SelectedBG.ZIndex = 1
+
+        local UICorner = Instance.new("UICorner")
+        UICorner.CornerRadius = UDim.new(0, 4)
+        UICorner.Parent = SelectedBG
+
+        Item.MouseButton1Click:Connect(function()
+            if isMulti then
+                local idx = table.find(selections, v)
+                if idx then
+                    table.remove(selections, idx)
+                else
+                    table.insert(selections, v)
+                end
+                callback(selections)
+            else
+                selections = v
+                callback(selections)
+                isdropping = false
+                Dropdown:TweenSize(UDim2.new(0, 436, 0, 29), "Out", "Quad", 0.3, true)
+                dropmain:TweenSize(UDim2.new(0, 442, 0, 31), "Out", "Quad", 0.3, true)
+                DropImage.Rotation = -90
+            end
+            RefreshTitle()
+            RefreshVisuals()
+        end)
+
+        table.insert(items, {Button = Item, SelectedBG = SelectedBG, Value = v})
+        UpdateCanvasSize()
+    end
+
+    -- // Refresh options by filter
+    local function RefreshOptions(filter)
+        ClearUI()
+        for _, v in ipairs(allOptions) do
+            if not filter or string.find(string.lower(v), string.lower(filter)) then
+                CreateItem(v)
+            end
+        end
+        RefreshVisuals()
+    end
+
+    -- // Search Hook
+    TextBox:GetPropertyChangedSignal("Text"):Connect(function()
+        if TextBox.Text == "" or TextBox.Text == "Search" then
+            RefreshOptions()
+        else
+            RefreshOptions(TextBox.Text)
+        end
+    end)
+
+    -- // Initial
+    RefreshTitle()
+    RefreshOptions()
+
+    -- Toggle dropdown
+    DropButton.MouseButton1Click:Connect(function()
+        if not isdropping then
+            isdropping = true
+            Dropdown:TweenSize(UDim2.new(0, 436, 0, 131), "Out", "Quad", 0.3, true)
+            dropmain:TweenSize(UDim2.new(0, 442, 0, 133), "Out", "Quad", 0.3, true)
+            DropImage.Rotation = 180
+        else
+            isdropping = false
+            Dropdown:TweenSize(UDim2.new(0, 436, 0, 29), "Out", "Quad", 0.3, true)
+            dropmain:TweenSize(UDim2.new(0, 442, 0, 31), "Out", "Quad", 0.3, true)
+            DropImage.Rotation = -90
+        end
+    end)
+
+    -- // Functions
+    local dropfunc = {}
+
+    function dropfunc:Set(val)
+        if isMulti then
+            selections = typeof(val) == "table" and val or {val}
+        else
+            selections = val
+        end
+        RefreshTitle()
+        RefreshVisuals()
+    end
+
+    function dropfunc:Add(v)
+        table.insert(allOptions, v)
+        RefreshOptions()
+    end
+
+    function dropfunc:Clear()
+        selections = isMulti and {} or nil
+        RefreshTitle()
+        ClearUI()
+        allOptions = {}
+    end
+
+    function dropfunc:Refresh(newOptions)
+        -- Store current dropdown state
+        local wasDropping = isdropping
+        local currentSearch = TextBox.Text
+        
+        -- Update options if provided
+        if newOptions then
+            allOptions = newOptions
+        end
+        
+        -- Refresh with current search filter
+        if currentSearch == "" or currentSearch == "Search" then
+            RefreshOptions()
+        else
+            RefreshOptions(currentSearch)
+        end
+        
+        -- Maintain dropdown state - don't change open/close state
+        -- The dropdown stays exactly as it was before refresh
+    end
+
+    return dropfunc
+end
 
 
             function main:Slider(text, min, max, set, callback)
