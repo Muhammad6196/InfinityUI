@@ -1,4 +1,4 @@
---Welcome mate if you're using this ui atleast advertise my script https://discord.gg/88gR5XUpkC thank u
+--welcome :> if u are using my ui pls shout out to my discord server as well i also make script for games https://discord.gg/88gR5XUpkC i really appriciate it 
 local function randomString(length)
     local chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
     local str = ""
@@ -562,7 +562,7 @@ if IKAI then
                 if toggled == false then
                     toggled = true
                     Main.Visible = false
-                    -- Don't hide the mini button when toggling with keybind
+                    
                     if MiniFrame then
                         MiniFrame.Visible = true
                     end
@@ -1854,7 +1854,6 @@ if IKAI then
                 NotificationService:CloseAll()
             end
 
-
             function main:Dropdown(text, old, options, mode, callback)
                 assert(typeof(text) == "string", "text must be a string")
                 assert(typeof(options) == "table", "options must be a table")
@@ -1884,6 +1883,7 @@ if IKAI then
                 local isDropped = false
                 local itemMap = {} 
                 local allOptions = table.clone(options) 
+                local calculatedOpenHeight = isMobileLayout and 160 or 200 
 
                 
                 local Dropdown = Instance.new("Frame")
@@ -1980,6 +1980,8 @@ if IKAI then
                 SearchBox.TextXAlignment = Enum.TextXAlignment.Center
 
                 
+                local TweenService = game:GetService("TweenService")
+                
                 SearchBox.Focused:Connect(function()
                     TweenService:Create(SearchInputStroke, TweenInfo.new(0.2), {
                         Color = theme.Accent
@@ -2030,7 +2032,7 @@ if IKAI then
                 DropScroll.Active = true
                 DropScroll.BackgroundTransparency = 1
                 DropScroll.BorderSizePixel = 0
-                DropScroll.Size = UDim2.new(1, 0, .68, 0)
+                DropScroll.Size = UDim2.new(1, 0, 1, 0) 
                 DropScroll.ScrollBarThickness = isMobileLayout and 4 or 3
                 DropScroll.ScrollBarImageColor3 = theme.Border
                 DropScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -2050,8 +2052,6 @@ if IKAI then
                 UIPadding.Parent = DropScroll
 
                 
-                local TweenService = game:GetService("TweenService")
-
                 local function updateTitle()
                     if isMulti then
                         if #selections == 0 then
@@ -2094,7 +2094,7 @@ if IKAI then
                     button.Name = "Option_" .. tostring(value)
                     button.BackgroundColor3 = theme.Surface
                     button.BackgroundTransparency = 0.9
-                    button.Size = UDim2.new(1, isMobileLayout and -10 or -20, 0, isMobileLayout and 25 or 30)
+                    button.Size = UDim2.new(1, 0, 0, isMobileLayout and 25 or 30) 
                     button.Font = Enum.Font.GothamMedium
                     button.Text = tostring(value)
                     button.TextColor3 = theme.TextPrimary
@@ -2189,12 +2189,27 @@ if IKAI then
                     for _, opt in ipairs(filtered) do
                         createOption(opt)
                     end
-
+                    
+                    
                     task.defer(function()
-                        if DropScroll.Parent then 
-                            local height = UIListLayout.AbsoluteContentSize.Y + 10
-                            DropScroll.CanvasSize = UDim2.new(0, 0, 0, height)
-                            OptionsContainer.Size = UDim2.new(1, 0, 0, math.clamp(height + 10, 80, 250))
+                        if DropScroll.Parent and UIListLayout then 
+                            UIListLayout:SetAttribute("Calculate", math.random()) 
+                            local contentHeight = UIListLayout.AbsoluteContentSize.Y
+                            
+                            
+                            local scrollHeight = math.clamp(contentHeight + (isMobileLayout and 6 or 10), 80, 250)
+                            DropScroll.CanvasSize = UDim2.new(0, 0, 0, contentHeight + UIListLayout.Padding.Offset * #filtered) 
+                            
+                            OptionsContainer.Size = UDim2.new(1, 0, 0, scrollHeight)
+                            
+                            
+                            local headerOffset = isMobileLayout and 65 or 75
+                            calculatedOpenHeight = headerOffset + scrollHeight
+
+                            
+                            if #filtered == 0 then
+                            calculatedOpenHeight = headerOffset + (isMobileLayout and 40 or 50) 
+                            end
                         end
                     end)
                 end
@@ -2214,10 +2229,13 @@ if IKAI then
                     if isDropped then
                         SearchContainer.Visible = true
                         OptionsContainer.Visible = true
-                        Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, isMobileLayout and 160 or 200), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+                        
+                        
+                        Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, calculatedOpenHeight), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+                        
                         DropImage.Rotation = 180
 
-                        refreshOptions("")
+                        refreshOptions("") 
                         task.delay(0.05, function()
                             if SearchBox and SearchBox.Parent then
                                 SearchBox:CaptureFocus()
@@ -2267,7 +2285,7 @@ if IKAI then
 
                 
                 updateTitle()
-                refreshOptions("")
+                refreshOptions("") 
 
                 
                 local api = {}
@@ -2336,9 +2354,7 @@ if IKAI then
                         assert(typeof(newOpts) == "table", "newOpts must be a table")
                         allOptions = table.clone(newOpts)
                     end
-                    if isDropped then
-                        refreshOptions(SearchBox.Text)
-                    end
+                    refreshOptions(isDropped and SearchBox.Text or "")
                 end
 
                 function api:GetOptions()
@@ -2347,6 +2363,7 @@ if IKAI then
 
                 return api
             end
+
 
             function main:Textbox(text, placeholder, callback)
                 local Textbox = Instance.new("Frame")
@@ -2555,4 +2572,3 @@ if IKAI then
         return uitab
     end
 end
-return library
