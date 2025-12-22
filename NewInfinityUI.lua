@@ -2100,15 +2100,33 @@ if IKAI then
                     button.Text = tostring(value)
                     button.TextColor3 = theme.TextPrimary
                     button.TextSize = isMobileLayout and 11 or 13
-                    button.TextXAlignment = Enum.TextXAlignment.Center
+                    button.TextXAlignment = Enum.TextXAlignment.Left
                     button.TextYAlignment = Enum.TextYAlignment.Center
                     button.AutoButtonColor = false
                     button.Parent = DropScroll
-
+                    if isItemSelected(value) then
+                        local checkmark = Instance.new("TextLabel")
+                        checkmark.Name = "Checkmark"
+                        checkmark.BackgroundTransparency = 1
+                        checkmark.Size = UDim2.new(0, 20, 1, 0)
+                        checkmark.Position = UDim2.new(1, -25, 0, 0)
+                        checkmark.Font = Enum.Font.GothamBold
+                        checkmark.Text = "✓"
+                        checkmark.TextColor3 = theme.Accent
+                        checkmark.TextSize = isMobileLayout and 12 or 14
+                        checkmark.Parent = button
+                        button.TextXAlignment = Enum.TextXAlignment.Left
+                        local padding = Instance.new("UIPadding")
+                        padding.PaddingLeft = UDim.new(0, 10)
+                        padding.Parent = button
+                    else
+                        button.TextXAlignment = Enum.TextXAlignment.Center
+                    end
+                
                     local corner = Instance.new("UICorner")
                     corner.CornerRadius = UDim.new(0, 4)
                     corner.Parent = button
-
+                
                     local stroke = Instance.new("UIStroke")
                     stroke.Color = theme.Border
                     stroke.Thickness = 1
@@ -2168,8 +2186,10 @@ if IKAI then
                 end
 
                 local function clearOptions()
-                    for _, data in pairs(itemMap) do
-                        data.Button:Destroy()
+                    for _, child in ipairs(DropScroll:GetChildren()) do
+                        if child.Name:find("Option_") or child.Name:find("Separator_") then
+                            child:Destroy()
+                        end
                     end
                     itemMap = {}
                     DropScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -2199,34 +2219,88 @@ if IKAI then
                     clearOptions()
                     local filtered = {}
                     filter = filter and string.lower(tostring(filter)) or ""
-
+                    local selectedItems = {}
+                    local unselectedItems = {}
+                
                     for _, opt in ipairs(allOptions) do
                         local optStr = tostring(opt)
-                        if filter == "" or string.lower(optStr):match(filter) then
-                            table.insert(filtered, opt)
-                        end
-                    end
-
-                    for _, opt in ipairs(filtered) do
-                        createOption(opt)
-                    end
-                    task.defer(function()
-                        if OptionsContainer and OptionsContainer.Parent then
-                            local itemHeight = isMobileLayout and 28 or 35
-                            local maxVisibleItems = 5
-                            local minVisibleItems = 1
-                            
-                            local itemCount = #filtered
-                            local visibleItems = math.clamp(itemCount, minVisibleItems, maxVisibleItems)
-                            local containerHeight = visibleItems * itemHeight + (isMobileLayout and 10 or 15)
-                            OptionsContainer.Size = UDim2.new(1, 0, 0, containerHeight)
-                            if isDropped then
-                                local dropdownHeight = (isMobileLayout and 32 or 36) + (isMobileLayout and 30 or 35) + containerHeight + 5              
-                                Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, dropdownHeight), 
-                                    Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+                        if filter == "" or string.lower(optStr):find(filter, 1, true) then
+                            if isItemSelected(opt) then
+                                table.insert(selectedItems, opt)
+                            else
+                                table.insert(unselectedItems, opt)
                             end
                         end
-                    end)
+                    end
+                    if #selectedItems > 0 then
+                        local separator = Instance.new("TextLabel")
+                        separator.Name = "Separator_Selected"
+                        separator.BackgroundTransparency = 1
+                        separator.Size = UDim2.new(1, isMobileLayout and -10 or -20, 0, isMobileLayout and 20 or 25)
+                        separator.Font = Enum.Font.GothamMedium
+                        separator.Text = "  SELECTED (" .. #selectedItems .. ")"
+                        separator.TextColor3 = theme.Accent
+                        separator.TextSize = isMobileLayout and 10 or 12
+                        separator.TextXAlignment = Enum.TextXAlignment.Left
+                        separator.Parent = DropScroll
+                        local underline = Instance.new("Frame")
+                        underline.Name = "Underline"
+                        underline.BackgroundColor3 = theme.Accent
+                        underline.BackgroundTransparency = 0.5
+                        underline.BorderSizePixel = 0
+                        underline.Position = UDim2.new(0, 10, 1, -2)
+                        underline.Size = UDim2.new(1, -20, 0, 1)
+                        underline.Parent = separator
+                    end
+                    for _, opt in ipairs(selectedItems) do
+                        createOption(opt)
+                    end
+                    if #selectedItems > 0 and #unselectedItems > 0 then
+                        local separator = Instance.new("TextLabel")
+                        separator.Name = "Separator_All"
+                        separator.BackgroundTransparency = 1
+                        separator.Size = UDim2.new(1, isMobileLayout and -10 or -20, 0, isMobileLayout and 20 or 25)
+                        separator.Font = Enum.Font.GothamMedium
+                        separator.Text = "  ALL ITEMS"
+                        separator.TextColor3 = theme.TextSecondary
+                        separator.TextSize = isMobileLayout and 10 or 12
+                        separator.TextXAlignment = Enum.TextXAlignment.Left
+                        separator.Parent = DropScroll
+                        local underline = Instance.new("Frame")
+                        underline.Name = "Underline"
+                        underline.BackgroundColor3 = theme.TextSecondary
+                        underline.BackgroundTransparency = 0.7
+                        underline.BorderSizePixel = 0
+                        underline.Position = UDim2.new(0, 10, 1, -2)
+                        underline.Size = UDim2.new(1, -20, 0, 1)
+                        underline.Parent = separator
+                    end
+                    for _, opt in ipairs(unselectedItems) do
+                        createOption(opt)
+                    end
+                    task.wait(0.01)
+                    
+                    if OptionsContainer and OptionsContainer.Parent then
+                        local itemHeight = isMobileLayout and 28 or 35
+                        local separatorHeight = isMobileLayout and 25 or 30
+                        local maxVisibleItems = 5
+                        local minVisibleItems = 1
+                        local totalItemCount = #selectedItems + #unselectedItems
+                        local separatorCount = 0
+                        if #selectedItems > 0 then separatorCount = separatorCount + 1 end
+                        if #selectedItems > 0 and #unselectedItems > 0 then separatorCount = separatorCount + 1 end
+                        
+                        local visibleItems = math.clamp(totalItemCount, minVisibleItems, maxVisibleItems)
+                        local containerHeight = (visibleItems * itemHeight) + (separatorCount * separatorHeight) + (isMobileLayout and 10 or 15)
+                        OptionsContainer.Size = UDim2.new(1, 0, 0, containerHeight)
+                        local totalCanvasHeight = (totalItemCount * itemHeight) + (separatorCount * separatorHeight) + (isMobileLayout and 10 or 15)
+                        DropScroll.CanvasSize = UDim2.new(0, 0, 0, totalCanvasHeight)
+                        if isDropped then
+                            local dropdownHeight = (isMobileLayout and 32 or 36) + (isMobileLayout and 30 or 35) + containerHeight + 5
+                            Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, dropdownHeight), 
+                                Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+                        end
+                    end
                 end
 
                 
