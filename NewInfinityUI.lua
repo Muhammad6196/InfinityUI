@@ -2020,7 +2020,7 @@ if IKAI then
                 OptionsContainer.Name = "OptionsContainer"
                 OptionsContainer.BackgroundTransparency = 1
                 OptionsContainer.Position = UDim2.fromOffset(0, isMobileLayout and 65 or 75)
-                OptionsContainer.Size = UDim2.new(1, 0, 0, isMobileLayout and 100 or 120)
+                OptionsContainer.Size = UDim2.new(1, 0, 0, 0) -- Will be set dynamically
                 OptionsContainer.Visible = false
                 OptionsContainer.ClipsDescendants = true
                 OptionsContainer.Parent = Dropdown
@@ -2030,11 +2030,12 @@ if IKAI then
                 DropScroll.Active = true
                 DropScroll.BackgroundTransparency = 1
                 DropScroll.BorderSizePixel = 0
-                DropScroll.Size = UDim2.new(1, 0, .68, 0)
-                DropScroll.ScrollBarThickness = isMobileLayout and 4 or 3
+                DropScroll.Size = UDim2.new(1, 0, 1, 0) -- Fill OptionsContainer
+                DropScroll.ScrollBarThickness = isMobileLayout and 4 or 6
                 DropScroll.ScrollBarImageColor3 = theme.Border
-                DropScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+                DropScroll.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
                 DropScroll.ScrollingDirection = Enum.ScrollingDirection.Y
+                DropScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
                 DropScroll.Parent = OptionsContainer
 
                 local UIListLayout = Instance.new("UIListLayout")
@@ -2174,6 +2175,26 @@ if IKAI then
                     DropScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
                 end
 
+                local function updateScrollSize()
+                    if DropScroll and DropScroll.Parent then
+                        local totalHeight = 0
+                        local childCount = 0
+                        for _, child in ipairs(DropScroll:GetChildren()) do
+                            if child:IsA("GuiObject") and child.Name:find("Option_") then
+                                totalHeight = totalHeight + child.AbsoluteSize.Y + UIListLayout.Padding.Offset
+                                childCount = childCount + 1
+                            end
+                        end
+                        if childCount > 0 then
+                            totalHeight = totalHeight + (isMobileLayout and 5 or 10)
+                        end
+                        DropScroll.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+                    end
+                end
+                UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                    updateScrollSize()
+                end)
+
                 local function refreshOptions(filter)
                     clearOptions()
                     local filtered = {}
@@ -2181,7 +2202,7 @@ if IKAI then
 
                     for _, opt in ipairs(allOptions) do
                         local optStr = tostring(opt)
-                        if filter == "" or string.find(string.lower(optStr), filter, 1, true) then
+                        if filter == "" or string.lower(optStr):match(filter) then
                             table.insert(filtered, opt)
                         end
                     end
@@ -2189,12 +2210,21 @@ if IKAI then
                     for _, opt in ipairs(filtered) do
                         createOption(opt)
                     end
-
                     task.defer(function()
-                        if DropScroll.Parent then 
-                            local height = UIListLayout.AbsoluteContentSize.Y + 10
-                            DropScroll.CanvasSize = UDim2.new(0, 0, 0, height)
-                            OptionsContainer.Size = UDim2.new(1, 0, 0, math.clamp(height + 10, 80, 250))
+                        if OptionsContainer and OptionsContainer.Parent then
+                            local itemHeight = isMobileLayout and 28 or 35
+                            local maxVisibleItems = 5
+                            local minVisibleItems = 1
+                            
+                            local itemCount = #filtered
+                            local visibleItems = math.clamp(itemCount, minVisibleItems, maxVisibleItems)
+                            local containerHeight = visibleItems * itemHeight + (isMobileLayout and 10 or 15)
+                            OptionsContainer.Size = UDim2.new(1, 0, 0, containerHeight)
+                            if isDropped then
+                                local dropdownHeight = (isMobileLayout and 32 or 36) + (isMobileLayout and 30 or 35) + containerHeight + 5              
+                                Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, dropdownHeight), 
+                                    Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+                            end
                         end
                     end)
                 end
@@ -2214,7 +2244,15 @@ if IKAI then
                     if isDropped then
                         SearchContainer.Visible = true
                         OptionsContainer.Visible = true
-                        Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, isMobileLayout and 160 or 200), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+                        local itemHeight = isMobileLayout and 28 or 35
+                        local initialHeight = 3 * itemHeight + (isMobileLayout and 10 or 15)
+                        
+                        OptionsContainer.Size = UDim2.new(1, 0, 0, initialHeight)
+                        
+                        local dropdownHeight = (isMobileLayout and 32 or 36) + (isMobileLayout and 30 or 35) + initialHeight + 5
+                        
+                        Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, dropdownHeight), 
+                            Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
                         DropImage.Rotation = 180
 
                         refreshOptions("")
@@ -2224,7 +2262,8 @@ if IKAI then
                             end
                         end)
                     else
-                        Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, isMobileLayout and 32 or 36), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+                        Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, isMobileLayout and 32 or 36), 
+                            Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
                         DropImage.Rotation = 0
                         SearchContainer.Visible = false
                         OptionsContainer.Visible = false
@@ -2554,5 +2593,5 @@ if IKAI then
         end
         return uitab
     end
+    return library
 end
-return library
