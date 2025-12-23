@@ -1534,11 +1534,11 @@ if IKAI then
                     CloseButton.BackgroundTransparency = 1
                     CloseButton.Size = UDim2.new(0, 16, 0, 16)
                     CloseButton.Position = UDim2.new(1, -20, 0, 4)
-                    CloseButton.Image = "rbxassetid://3926305904"
+                    CloseButton.Image = "rbxassetid://10747383819"
                     CloseButton.ImageRectOffset = Vector2.new(284, 4)
                     CloseButton.ImageRectSize = Vector2.new(24, 24)
                     CloseButton.ImageColor3 = _G.TextSecondary
-                    CloseButton.ImageTransparency = 1
+                    CloseButton.ImageTransparency = 0
                     CloseButton.ZIndex = 102
 
                     
@@ -2089,8 +2089,8 @@ if IKAI then
                         }):Play()
                     end
                 end
-
-                local function createOption(value)
+                local createOption, refreshOptions
+                createOption = function(value)
                     local button = Instance.new("TextButton")
                     button.Name = "Option_" .. tostring(value)
                     button.BackgroundColor3 = theme.Surface
@@ -2104,29 +2104,14 @@ if IKAI then
                     button.TextYAlignment = Enum.TextYAlignment.Center
                     button.AutoButtonColor = false
                     button.Parent = DropScroll
-                    if isItemSelected(value) then
-                        local checkmark = Instance.new("TextLabel")
-                        checkmark.Name = "Checkmark"
-                        checkmark.BackgroundTransparency = 1
-                        checkmark.Size = UDim2.new(0, 20, 1, 0)
-                        checkmark.Position = UDim2.new(1, -25, 0, 0)
-                        checkmark.Font = Enum.Font.GothamBold
-                        checkmark.Text = "✓"
-                        checkmark.TextColor3 = theme.Accent
-                        checkmark.TextSize = isMobileLayout and 12 or 14
-                        checkmark.Parent = button
-                        button.TextXAlignment = Enum.TextXAlignment.Left
-                        local padding = Instance.new("UIPadding")
-                        padding.PaddingLeft = UDim.new(0, 10)
-                        padding.Parent = button
-                    else
-                        button.TextXAlignment = Enum.TextXAlignment.Center
-                    end
-                
+                    local padding = Instance.new("UIPadding")
+                    padding.PaddingLeft = UDim.new(0, 10)
+                    padding.Parent = button
+
                     local corner = Instance.new("UICorner")
                     corner.CornerRadius = UDim.new(0, 4)
                     corner.Parent = button
-                
+
                     local stroke = Instance.new("UIStroke")
                     stroke.Color = theme.Border
                     stroke.Thickness = 1
@@ -2152,6 +2137,50 @@ if IKAI then
                     end)
 
                     
+                    local function updateItemAppearance(button, isSelected)
+                        local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad)
+                        local checkmark = button:FindFirstChild("Checkmark")
+                        
+                        if isSelected then
+                            if not checkmark then
+                                checkmark = Instance.new("TextLabel")
+                                checkmark.Name = "Checkmark"
+                                checkmark.BackgroundTransparency = 1
+                                checkmark.Size = UDim2.new(0, 20, 1, 0)
+                                checkmark.Position = UDim2.new(1, -25, 0, 0)
+                                checkmark.Font = Enum.Font.GothamBold
+                                checkmark.Text = "✓"
+                                checkmark.TextColor3 = theme.Accent
+                                checkmark.TextSize = isMobileLayout and 12 or 14
+                                checkmark.Parent = button
+                            end
+                            
+                            TweenService:Create(button, tweenInfo, {
+                                BackgroundTransparency = 0.7,
+                                TextColor3 = theme.Accent
+                            }):Play()
+                            TweenService:Create(checkmark, tweenInfo, {
+                                TextTransparency = 0
+                            }):Play()
+                        else
+                            if checkmark then
+                                TweenService:Create(checkmark, tweenInfo, {
+                                    TextTransparency = 1
+                                }):Play()
+                                delay(0.2, function()
+                                    if checkmark and checkmark.Parent then
+                                        checkmark:Destroy()
+                                    end
+                                end)
+                            end
+                            
+                            TweenService:Create(button, tweenInfo, {
+                                BackgroundTransparency = 0.9,
+                                TextColor3 = theme.TextPrimary
+                            }):Play()
+                        end
+                    end
+
                     button.MouseButton1Click:Connect(function()
                         if isMulti then
                             local idx = table.find(selections, value)
@@ -2160,26 +2189,27 @@ if IKAI then
                             else
                                 table.insert(selections, value)
                             end
-                            callback(table.clone(selections)) 
+                            callback(table.clone(selections))
                         else
                             selections = value
                             callback(selections)
-
-                            
                             isDropped = false
-                            Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, isMobileLayout and 32 or 36), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+                            Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, isMobileLayout and 32 or 36), 
+                                Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
                             DropImage.Rotation = 0
                             SearchContainer.Visible = false
                             OptionsContainer.Visible = false
                         end
-
-                        
-                        for _, data in pairs(itemMap) do
-                            updateItemAppearance(data.Button, isItemSelected(data.Value))
+                        if isMulti and isDropped then
+                            local currentFilter = SearchBox.Text
+                            refreshOptions(currentFilter)
+                        else
+                            for _, data in pairs(itemMap) do
+                                updateItemAppearance(data.Button, isItemSelected(data.Value))
+                            end
                         end
-
-                        updateTitle()
-                    end)
+                    updateTitle()
+                end)
 
                     itemMap[value] = {Button = button, Value = value}
                     updateItemAppearance(button, isItemSelected(value))
@@ -2215,7 +2245,7 @@ if IKAI then
                     updateScrollSize()
                 end)
 
-                local function refreshOptions(filter)
+                refreshOptions = function(filter)
                     clearOptions()
                     local filtered = {}
                     filter = filter and string.lower(tostring(filter)) or ""
