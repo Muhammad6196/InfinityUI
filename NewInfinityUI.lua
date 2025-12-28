@@ -2476,7 +2476,7 @@ if IKAI then
 
                 function api:Refresh(newOpts)
                     if newOpts then allOptions = table.clone(newOpts) end
-                    refreshOptions(SearchInput.Text)
+                    refreshOptions(SearchBox.Text)
                     updateTitle()
                     callback(api:Get())
                 end
