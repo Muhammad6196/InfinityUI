@@ -1859,10 +1859,10 @@ if IKAI then
                 assert(typeof(text) == "string", "text must be a string")
                 assert(typeof(options) == "table", "options must be a table")
                 assert(typeof(callback) == "function", "callback must be a function")
+            
                 mode = string.lower(mode or "single")
                 local isMulti = (mode == "multi")
-
-                
+            
                 local theme = {
                     Surface = _G.Surface,
                     Border = _G.Border,
@@ -1870,623 +1870,209 @@ if IKAI then
                     TextSecondary = _G.TextSecondary,
                     Accent = _G.Accent,
                 }
-
-                
+            
                 local selections = isMulti and {} or nil
                 if old ~= nil then
                     if isMulti then
-                        selections = typeof(old) == "table" and old or {old}
+                        selections = typeof(old) == "table" and table.clone(old) or {old}
                     else
                         selections = old
                     end
                 end
-
+            
                 local isDropped = false
-                local itemMap = {} 
-                local allOptions = table.clone(options) 
-
-                
+                local itemMap = {}
+                local allOptions = table.clone(options)
+            
                 local Dropdown = Instance.new("Frame")
                 Dropdown.Name = "Dropdown"
                 Dropdown.AnchorPoint = Vector2.new(0.5, 0)
                 Dropdown.BackgroundColor3 = theme.Surface
                 Dropdown.BackgroundTransparency = 0.9
-                Dropdown.Size = UDim2.new(0, elementWidth, 0, isMobileLayout and 32 or 36)
+                Dropdown.Size = UDim2.new(0, elementWidth, 0, 36)
                 Dropdown.ClipsDescendants = true
                 Dropdown.Parent = MainFramePage
-
-                local DropdownCorner = Instance.new("UICorner")
-                DropdownCorner.CornerRadius = UDim.new(0, 6)
-                DropdownCorner.Parent = Dropdown
-
-                local DropdownStroke = Instance.new("UIStroke")
-                DropdownStroke.Color = theme.Border
-                DropdownStroke.Thickness = 1
-                DropdownStroke.Parent = Dropdown
-
-                
+            
                 local DropHeader = Instance.new("Frame")
-                DropHeader.Name = "DropHeader"
                 DropHeader.BackgroundTransparency = 1
-                DropHeader.Size = UDim2.new(1, 0, 0, isMobileLayout and 32 or 36)
+                DropHeader.Size = UDim2.new(1, 0, 0, 36)
                 DropHeader.Parent = Dropdown
-
+            
                 local DropTitle = Instance.new("TextLabel")
-                DropTitle.Name = "DropTitle"
                 DropTitle.BackgroundTransparency = 1
-                DropTitle.Position = UDim2.fromOffset(isMobileLayout and 10 or 15, 0)
-                DropTitle.Size = UDim2.new(0, isMobileLayout and 200 or 300, 1, 0)
+                DropTitle.Position = UDim2.fromOffset(15, 0)
+                DropTitle.Size = UDim2.new(0, 300, 1, 0)
                 DropTitle.Font = Enum.Font.GothamMedium
                 DropTitle.TextColor3 = theme.TextPrimary
-                DropTitle.TextSize = isMobileLayout and 12 or 14
+                DropTitle.TextSize = 14
                 DropTitle.TextXAlignment = Enum.TextXAlignment.Left
                 DropTitle.Parent = DropHeader
-
+            
                 local DropImage = Instance.new("ImageLabel")
-                DropImage.Name = "DropImage"
                 DropImage.BackgroundTransparency = 1
-                DropImage.Position = UDim2.new(1, isMobileLayout and -20 or -25, 0.5, isMobileLayout and -6 or -8)
-                DropImage.Size = isMobileLayout and UDim2.fromOffset(12, 12) or UDim2.fromOffset(16, 16)
-                DropImage.Image = "rbxassetid://6031090990" 
+                DropImage.Position = UDim2.new(1, -25, 0.5, -8)
+                DropImage.Size = UDim2.fromOffset(16, 16)
+                DropImage.Image = "rbxassetid://6031090990"
                 DropImage.ImageColor3 = theme.TextSecondary
                 DropImage.Parent = DropHeader
-
+            
                 local DropButton = Instance.new("TextButton")
-                DropButton.Name = "DropButton"
                 DropButton.BackgroundTransparency = 1
                 DropButton.Size = UDim2.new(1, 0, 1, 0)
                 DropButton.Text = ""
                 DropButton.Parent = DropHeader
-
-                
+            
                 local SearchContainer = Instance.new("Frame")
-                SearchContainer.Name = "SearchContainer"
                 SearchContainer.BackgroundTransparency = 1
-                SearchContainer.Position = UDim2.fromOffset(isMobileLayout and 5 or 10, isMobileLayout and 35 or 40)
-                SearchContainer.Size = UDim2.new(1, isMobileLayout and -10 or -20, 0, isMobileLayout and 25 or 30)
+                SearchContainer.Position = UDim2.fromOffset(10, 40)
+                SearchContainer.Size = UDim2.new(1, -20, 0, 30)
                 SearchContainer.Visible = false
                 SearchContainer.Parent = Dropdown
-
-                
-                local SearchInputContainer = Instance.new("Frame")
-                SearchInputContainer.Name = "SearchInputContainer"
-                SearchInputContainer.Parent = SearchContainer
-                SearchInputContainer.BackgroundColor3 = theme.Surface
-                SearchInputContainer.BackgroundTransparency = 0.9
-                SearchInputContainer.Size = UDim2.new(1, 0, 1, 0)
-                SearchInputContainer.ClipsDescendants = true
-
-                local SearchInputCorner = Instance.new("UICorner")
-                SearchInputCorner.CornerRadius = UDim.new(0, 4)
-                SearchInputCorner.Parent = SearchInputContainer
-
-                local SearchInputStroke = Instance.new("UIStroke")
-                SearchInputStroke.Color = theme.Border
-                SearchInputStroke.Thickness = 1
-                SearchInputStroke.Parent = SearchInputContainer
-
+            
                 local SearchBox = Instance.new("TextBox")
-                SearchBox.Name = "SearchBox"
-                SearchBox.Parent = SearchInputContainer
                 SearchBox.BackgroundTransparency = 1
                 SearchBox.Size = UDim2.new(1, 0, 1, 0)
                 SearchBox.Font = Enum.Font.GothamMedium
                 SearchBox.PlaceholderText = "Search..."
                 SearchBox.PlaceholderColor3 = theme.TextSecondary
                 SearchBox.TextColor3 = theme.TextPrimary
-                SearchBox.TextSize = isMobileLayout and 11 or 13
-                SearchBox.Text = ""
+                SearchBox.TextSize = 13
                 SearchBox.ClearTextOnFocus = false
-                SearchBox.TextXAlignment = Enum.TextXAlignment.Center
-
-                
-                SearchBox.Focused:Connect(function()
-                    TweenService:Create(SearchInputStroke, TweenInfo.new(0.2), {
-                        Color = theme.Accent
-                    }):Play()
-                    TweenService:Create(SearchInputContainer, TweenInfo.new(0.2), {
-                        BackgroundTransparency = 0.85
-                    }):Play()
-                end)
-
-                SearchBox.FocusLost:Connect(function()
-                    TweenService:Create(SearchInputStroke, TweenInfo.new(0.2), {
-                        Color = theme.Border
-                    }):Play()
-                    TweenService:Create(SearchInputContainer, TweenInfo.new(0.2), {
-                        BackgroundTransparency = 0.9
-                    }):Play()
-                end)
-
-                
-                SearchInputContainer.MouseEnter:Connect(function()
-                    if not SearchBox:IsFocused() then
-                        TweenService:Create(SearchInputStroke, TweenInfo.new(0.2), {
-                            Color = Color3.fromRGB(100, 100, 100)
-                        }):Play()
-                    end
-                end)
-
-                SearchInputContainer.MouseLeave:Connect(function()
-                    if not SearchBox:IsFocused() then
-                        TweenService:Create(SearchInputStroke, TweenInfo.new(0.2), {
-                            Color = theme.Border
-                        }):Play()
-                    end
-                end)
-
-                
+                SearchBox.Parent = SearchContainer
+            
                 local OptionsContainer = Instance.new("Frame")
-                OptionsContainer.Name = "OptionsContainer"
                 OptionsContainer.BackgroundTransparency = 1
-                OptionsContainer.Position = UDim2.fromOffset(0, isMobileLayout and 65 or 75)
-                OptionsContainer.Size = UDim2.new(1, 0, 0, 0) -- Will be set dynamically
+                OptionsContainer.Position = UDim2.fromOffset(0, 75)
+                OptionsContainer.Size = UDim2.new(1, 0, 0, 150)
                 OptionsContainer.Visible = false
-                OptionsContainer.ClipsDescendants = true
                 OptionsContainer.Parent = Dropdown
-
+            
                 local DropScroll = Instance.new("ScrollingFrame")
-                DropScroll.Name = "DropScroll"
-                DropScroll.Active = true
                 DropScroll.BackgroundTransparency = 1
                 DropScroll.BorderSizePixel = 0
-                DropScroll.Size = UDim2.new(1, 0, 1, 0) -- Fill OptionsContainer
-                DropScroll.ScrollBarThickness = isMobileLayout and 4 or 6
-                DropScroll.ScrollBarImageColor3 = theme.Border
-                DropScroll.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
+                DropScroll.Size = UDim2.new(1, 0, 1, 0)
+                DropScroll.ScrollBarThickness = 6
                 DropScroll.ScrollingDirection = Enum.ScrollingDirection.Y
-                DropScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+                DropScroll.CanvasSize = UDim2.new()
                 DropScroll.Parent = OptionsContainer
-
-                local UIListLayout = Instance.new("UIListLayout")
-                UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-                UIListLayout.Padding = UDim.new(0, isMobileLayout and 3 or 5)
-                UIListLayout.Parent = DropScroll
-
-                local UIPadding = Instance.new("UIPadding")
-                UIPadding.PaddingLeft = UDim.new(0, isMobileLayout and 5 or 10)
-                UIPadding.PaddingTop = UDim.new(0, isMobileLayout and 3 or 5)
-                UIPadding.PaddingRight = UDim.new(0, isMobileLayout and 5 or 10)
-                UIPadding.PaddingBottom = UDim.new(0, isMobileLayout and 3 or 5)
-                UIPadding.Parent = DropScroll
-
-                
-                local TweenService = game:GetService("TweenService")
-
+            
+                local UIList = Instance.new("UIListLayout")
+                UIList.Padding = UDim.new(0, 5)
+                UIList.SortOrder = Enum.SortOrder.LayoutOrder
+                UIList.Parent = DropScroll
+            
                 local function updateTitle()
                     if isMulti then
                         if #selections == 0 then
                             DropTitle.Text = text .. " : "
                         elseif #selections == 1 then
-                            DropTitle.Text = text .. " : " .. tostring(selections[1])
+                            DropTitle.Text = text .. " : " .. selections[1]
                         else
                             DropTitle.Text = text .. " : " .. #selections .. " selected"
                         end
                     else
-                        DropTitle.Text = text .. " : " .. (selections and tostring(selections) or "")
+                        DropTitle.Text = text .. " : " .. (selections or "")
                     end
                 end
-
+            
                 local function isItemSelected(val)
-                    if isMulti then
-                        return table.find(selections, val) ~= nil
+                    return isMulti and table.find(selections, val) or selections == val
+                end
+            
+                local function updateItemAppearance(button, selected)
+                    local check = button:FindFirstChild("Checkmark")
+                    if selected then
+                        button.TextColor3 = theme.Accent
+                        if not check then
+                            check = Instance.new("TextLabel")
+                            check.Name = "Checkmark"
+                            check.BackgroundTransparency = 1
+                            check.Size = UDim2.new(0, 20, 1, 0)
+                            check.Position = UDim2.new(1, -25, 0, 0)
+                            check.Font = Enum.Font.GothamBold
+                            check.Text = "✓"
+                            check.TextColor3 = theme.Accent
+                            check.TextSize = 14
+                            check.Parent = button
+                        end
                     else
-                        return selections == val
+                        button.TextColor3 = theme.TextPrimary
+                        if check then check:Destroy() end
                     end
                 end
-
-                local function updateItemAppearance(button, isSelected)
-                    local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad)
-                    if isSelected then
-                        TweenService:Create(button, tweenInfo, {
-                            BackgroundTransparency = 0.7,
-                            TextColor3 = theme.Accent
-                        }):Play()
-                    else
-                        TweenService:Create(button, tweenInfo, {
-                            BackgroundTransparency = 0.9,
-                            TextColor3 = theme.TextPrimary
-                        }):Play()
-                    end
+            
+                local function clearOptions()
+                    for _,v in pairs(itemMap) do v.Button:Destroy() end
+                    table.clear(itemMap)
+                    DropScroll.CanvasSize = UDim2.new()
                 end
-                local createOption, refreshOptions
-                createOption = function(value)
+            
+                local function createOption(value)
                     local button = Instance.new("TextButton")
-                    button.Name = "Option_" .. tostring(value)
-                    button.BackgroundColor3 = theme.Surface
+                    button.Name = "Option_"..value
+                    button.Size = UDim2.new(1, -20, 0, 30)
                     button.BackgroundTransparency = 0.9
-                    button.Size = UDim2.new(1, isMobileLayout and -10 or -20, 0, isMobileLayout and 25 or 30)
                     button.Font = Enum.Font.GothamMedium
                     button.Text = tostring(value)
-                    button.TextColor3 = theme.TextPrimary
-                    button.TextSize = isMobileLayout and 11 or 13
                     button.TextXAlignment = Enum.TextXAlignment.Left
-                    button.TextYAlignment = Enum.TextYAlignment.Center
-                    button.AutoButtonColor = false
                     button.Parent = DropScroll
-                    local padding = Instance.new("UIPadding")
-                    padding.PaddingLeft = UDim.new(0, 10)
-                    padding.Parent = button
-
-                    local corner = Instance.new("UICorner")
-                    corner.CornerRadius = UDim.new(0, 4)
-                    corner.Parent = button
-
-                    local stroke = Instance.new("UIStroke")
-                    stroke.Color = theme.Border
-                    stroke.Thickness = 1
-                    stroke.Parent = button
-
-                    
-                    button.MouseEnter:Connect(function()
-                        if not isItemSelected(value) then
-                            TweenService:Create(button, TweenInfo.new(0.2), {
-                                BackgroundTransparency = 0.85,
-                                TextColor3 = theme.Accent
-                            }):Play()
-                        end
-                    end)
-
-                    button.MouseLeave:Connect(function()
-                        if not isItemSelected(value) then
-                            TweenService:Create(button, TweenInfo.new(0.2), {
-                                BackgroundTransparency = 0.9,
-                                TextColor3 = theme.TextPrimary
-                            }):Play()
-                        end
-                    end)
-
-                    
-                    local function updateItemAppearance(button, isSelected)
-                        local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad)
-                        local checkmark = button:FindFirstChild("Checkmark")
-                        
-                        if isSelected then
-                            if not checkmark then
-                                checkmark = Instance.new("TextLabel")
-                                checkmark.Name = "Checkmark"
-                                checkmark.BackgroundTransparency = 1
-                                checkmark.Size = UDim2.new(0, 20, 1, 0)
-                                checkmark.Position = UDim2.new(1, -25, 0, 0)
-                                checkmark.Font = Enum.Font.GothamBold
-                                checkmark.Text = "✓"
-                                checkmark.TextColor3 = theme.Accent
-                                checkmark.TextSize = isMobileLayout and 12 or 14
-                                checkmark.Parent = button
-                            end
-                            
-                            TweenService:Create(button, tweenInfo, {
-                                BackgroundTransparency = 0.7,
-                                TextColor3 = theme.Accent
-                            }):Play()
-                            TweenService:Create(checkmark, tweenInfo, {
-                                TextTransparency = 0
-                            }):Play()
-                        else
-                            if checkmark then
-                                TweenService:Create(checkmark, tweenInfo, {
-                                    TextTransparency = 1
-                                }):Play()
-                                delay(0.2, function()
-                                    if checkmark and checkmark.Parent then
-                                        checkmark:Destroy()
-                                    end
-                                end)
-                            end
-                            
-                            TweenService:Create(button, tweenInfo, {
-                                BackgroundTransparency = 0.9,
-                                TextColor3 = theme.TextPrimary
-                            }):Play()
-                        end
-                    end
-
+            
                     button.MouseButton1Click:Connect(function()
                         if isMulti then
-                            local idx = table.find(selections, value)
-                            if idx then
-                                table.remove(selections, idx)
-                            else
-                                table.insert(selections, value)
-                            end
-                            callback(table.clone(selections))
+                            local i = table.find(selections, value)
+                            i and table.remove(selections, i) or table.insert(selections, value)
                         else
                             selections = value
-                            callback(selections)
                             isDropped = false
-                            Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, isMobileLayout and 32 or 36), 
-                                Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
-                            DropImage.Rotation = 0
                             SearchContainer.Visible = false
                             OptionsContainer.Visible = false
+                            DropImage.Rotation = 0
+                            Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, 36),Enum.EasingDirection.Out,Enum.EasingStyle.Quad,0.2,true)
                         end
-                        if isMulti and isDropped then
-                            local currentFilter = SearchBox.Text
-                            refreshOptions(currentFilter)
-                        else
-                            for _, data in pairs(itemMap) do
-                                updateItemAppearance(data.Button, isItemSelected(data.Value))
-                            end
-                        end
-                    updateTitle()
-                end)
-
+            
+                        updateTitle()
+                        callback(isMulti and table.clone(selections) or selections)
+                        for _,v in pairs(itemMap) do updateItemAppearance(v.Button, isItemSelected(v.Value)) end
+                    end)
+            
                     itemMap[value] = {Button = button, Value = value}
                     updateItemAppearance(button, isItemSelected(value))
                 end
-
-                local function clearOptions()
-                    for _, child in ipairs(DropScroll:GetChildren()) do
-                        if child.Name:find("Option_") or child.Name:find("Separator_") then
-                            child:Destroy()
-                        end
-                    end
-                    itemMap = {}
-                    DropScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-                end
-
-                local function updateScrollSize()
-                    if DropScroll and DropScroll.Parent then
-                        local totalHeight = 0
-                        local childCount = 0
-                        for _, child in ipairs(DropScroll:GetChildren()) do
-                            if child:IsA("GuiObject") and child.Name:find("Option_") then
-                                totalHeight = totalHeight + child.AbsoluteSize.Y + UIListLayout.Padding.Offset
-                                childCount = childCount + 1
-                            end
-                        end
-                        if childCount > 0 then
-                            totalHeight = totalHeight + (isMobileLayout and 5 or 10)
-                        end
-                        DropScroll.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
-                    end
-                end
-                UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-                    updateScrollSize()
-                end)
-
-                refreshOptions = function(filter)
+            
+                local function refreshOptions(filter)
                     clearOptions()
-                    local filtered = {}
-                    filter = filter and string.lower(tostring(filter)) or ""
-                    local selectedItems = {}
-                    local unselectedItems = {}
-                
-                    for _, opt in ipairs(allOptions) do
-                        local optStr = tostring(opt)
-                        if filter == "" or string.lower(optStr):find(filter, 1, true) then
-                            if isItemSelected(opt) then
-                                table.insert(selectedItems, opt)
-                            else
-                                table.insert(unselectedItems, opt)
-                            end
-                        end
-                    end
-                    if #selectedItems > 0 then
-                        local separator = Instance.new("TextLabel")
-                        separator.Name = "Separator_Selected"
-                        separator.BackgroundTransparency = 1
-                        separator.Size = UDim2.new(1, isMobileLayout and -10 or -20, 0, isMobileLayout and 20 or 25)
-                        separator.Font = Enum.Font.GothamMedium
-                        separator.Text = "  SELECTED (" .. #selectedItems .. ")"
-                        separator.TextColor3 = theme.Accent
-                        separator.TextSize = isMobileLayout and 10 or 12
-                        separator.TextXAlignment = Enum.TextXAlignment.Left
-                        separator.Parent = DropScroll
-                        local underline = Instance.new("Frame")
-                        underline.Name = "Underline"
-                        underline.BackgroundColor3 = theme.Accent
-                        underline.BackgroundTransparency = 0.5
-                        underline.BorderSizePixel = 0
-                        underline.Position = UDim2.new(0, 10, 1, -2)
-                        underline.Size = UDim2.new(1, -20, 0, 1)
-                        underline.Parent = separator
-                    end
-                    for _, opt in ipairs(selectedItems) do
-                        createOption(opt)
-                    end
-                    if #selectedItems > 0 and #unselectedItems > 0 then
-                        local separator = Instance.new("TextLabel")
-                        separator.Name = "Separator_All"
-                        separator.BackgroundTransparency = 1
-                        separator.Size = UDim2.new(1, isMobileLayout and -10 or -20, 0, isMobileLayout and 20 or 25)
-                        separator.Font = Enum.Font.GothamMedium
-                        separator.Text = "  ALL ITEMS"
-                        separator.TextColor3 = theme.TextSecondary
-                        separator.TextSize = isMobileLayout and 10 or 12
-                        separator.TextXAlignment = Enum.TextXAlignment.Left
-                        separator.Parent = DropScroll
-                        local underline = Instance.new("Frame")
-                        underline.Name = "Underline"
-                        underline.BackgroundColor3 = theme.TextSecondary
-                        underline.BackgroundTransparency = 0.7
-                        underline.BorderSizePixel = 0
-                        underline.Position = UDim2.new(0, 10, 1, -2)
-                        underline.Size = UDim2.new(1, -20, 0, 1)
-                        underline.Parent = separator
-                    end
-                    for _, opt in ipairs(unselectedItems) do
-                        createOption(opt)
-                    end
-                    task.wait(0.01)
-                    
-                    if OptionsContainer and OptionsContainer.Parent then
-                        local itemHeight = isMobileLayout and 28 or 35
-                        local separatorHeight = isMobileLayout and 25 or 30
-                        local maxVisibleItems = 5
-                        local minVisibleItems = 1
-                        local totalItemCount = #selectedItems + #unselectedItems
-                        local separatorCount = 0
-                        if #selectedItems > 0 then separatorCount = separatorCount + 1 end
-                        if #selectedItems > 0 and #unselectedItems > 0 then separatorCount = separatorCount + 1 end
-                        
-                        local visibleItems = math.clamp(totalItemCount, minVisibleItems, maxVisibleItems)
-                        local containerHeight = (visibleItems * itemHeight) + (separatorCount * separatorHeight) + (isMobileLayout and 10 or 15)
-                        OptionsContainer.Size = UDim2.new(1, 0, 0, containerHeight)
-                        local totalCanvasHeight = (totalItemCount * itemHeight) + (separatorCount * separatorHeight) + (isMobileLayout and 10 or 15)
-                        DropScroll.CanvasSize = UDim2.new(0, 0, 0, totalCanvasHeight)
-                        if isDropped then
-                            local dropdownHeight = (isMobileLayout and 32 or 36) + (isMobileLayout and 30 or 35) + containerHeight + 5
-                            Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, dropdownHeight), 
-                                Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
-                        end
-                    end
+                    local s,u = {},{}
+                    for _,o in ipairs(allOptions) do (isItemSelected(o) and table.insert(s,o) or table.insert(u,o)) end
+                    table.sort(s)
+                    table.sort(u)
+                    for _,o in ipairs(s) do createOption(o) end
+                    for _,o in ipairs(u) do createOption(o) end
                 end
-
-                
-
-                
-                SearchBox.Changed:Connect(function(prop)
-                    if prop == "Text" then
-                        refreshOptions(SearchBox.Text)
-                    end
-                end)
-
-                
+            
+                SearchBox:GetPropertyChangedSignal("Text"):Connect(function() if isDropped then refreshOptions(SearchBox.Text) end end)
+            
                 DropButton.MouseButton1Click:Connect(function()
                     isDropped = not isDropped
-                    if isDropped then
-                        SearchContainer.Visible = true
-                        OptionsContainer.Visible = true
-                        local itemHeight = isMobileLayout and 28 or 35
-                        local initialHeight = 3 * itemHeight + (isMobileLayout and 10 or 15)
-                        
-                        OptionsContainer.Size = UDim2.new(1, 0, 0, initialHeight)
-                        
-                        local dropdownHeight = (isMobileLayout and 32 or 36) + (isMobileLayout and 30 or 35) + initialHeight + 5
-                        
-                        Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, dropdownHeight), 
-                            Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
-                        DropImage.Rotation = 180
-
-                        refreshOptions("")
-                        task.delay(0.05, function()
-                            if SearchBox and SearchBox.Parent then
-                                SearchBox:CaptureFocus()
-                            end
-                        end)
-                    else
-                        Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, isMobileLayout and 32 or 36), 
-                            Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
-                        DropImage.Rotation = 0
-                        SearchContainer.Visible = false
-                        OptionsContainer.Visible = false
-                    end
+                    SearchContainer.Visible = isDropped
+                    OptionsContainer.Visible = isDropped
+                    DropImage.Rotation = isDropped and 180 or 0
+                    if isDropped then refreshOptions("") end
                 end)
-
-                
-                local inputBeganConn
-                inputBeganConn = game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
-                    if gameProcessed or input.UserInputType ~= Enum.UserInputType.MouseButton1 or not isDropped then
-                        return
-                    end
-
-                    local mousePos = game:GetService("UserInputService"):GetMouseLocation()
-                    local absPos = Dropdown.AbsolutePosition
-                    local absSize = Dropdown.AbsoluteSize
-                    local inBounds = (
-                        mousePos.X >= absPos.X and mousePos.X <= absPos.X + absSize.X and
-                        mousePos.Y >= absPos.Y and mousePos.Y <= absPos.Y + absSize.Y
-                    )
-
-                    if not inBounds then
-                        isDropped = false
-                        Dropdown:TweenSize(UDim2.new(0, elementWidth, 0, isMobileLayout and 32 or 36), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
-                        DropImage.Rotation = 0
-                        SearchContainer.Visible = false
-                        OptionsContainer.Visible = false
-                    end
-                end)
-
-                
-                Dropdown.AncestryChanged:Connect(function()
-                    if not Dropdown.Parent then
-                        if inputBeganConn then
-                            inputBeganConn:Disconnect()
-                            inputBeganConn = nil
-                        end
-                    end
-                end)
-
-                
+            
+                local api = {}
+                function api:Get() return isMulti and table.clone(selections) or selections end
+                function api:Set(v) selections = isMulti and table.clone(v) or v; updateTitle(); callback(api:Get()) end
+                function api:Add(v) table.find(allOptions,v) or table.insert(allOptions,v); isDropped and refreshOptions(SearchBox.Text) end
+                function api:Remove(v) local i=table.find(allOptions,v); i and table.remove(allOptions,i); isMulti and (table.find(selections,v) and table.remove(selections,table.find(selections,v))); isDropped and refreshOptions(SearchBox.Text) end
+                function api:Clear() selections=isMulti and{}or nil; updateTitle(); callback(api:Get()) end
+                function api:Refresh(n) n and (allOptions=table.clone(n)); isDropped and refreshOptions(SearchBox.Text); updateTitle(); callback(api:Get()) end
+                function api:GetOptions() return table.clone(allOptions) end
+            
                 updateTitle()
                 refreshOptions("")
-
-                
-                local api = {}
-
-                function api:Get()
-                    return isMulti and table.clone(selections) or selections
-                end
-
-                function api:Set(val)
-                    if isMulti then
-                        selections = typeof(val) == "table" and table.clone(val) or {val}
-                    else
-                        selections = val
-                    end
-
-                    
-                    for _, data in pairs(itemMap) do
-                        updateItemAppearance(data.Button, isItemSelected(data.Value))
-                    end
-
-                    updateTitle()
-                    callback(api:Get())
-                end
-
-                function api:Add(value)
-                    if table.find(allOptions, value) then return end 
-                    table.insert(allOptions, value)
-                    if isDropped then
-                        refreshOptions(SearchBox.Text)
-                    end
-                end
-
-                function api:Remove(value)
-                    local idx = table.find(allOptions, value)
-                    if idx then
-                        table.remove(allOptions, idx)
-                    end
-
-                    if isMulti then
-                        local selIdx = table.find(selections, value)
-                        if selIdx then
-                            table.remove(selections, selIdx)
-                        end
-                    elseif selections == value then
-                        selections = nil
-                    end
-
-                    if isDropped then
-                        refreshOptions(SearchBox.Text)
-                    end
-
-                    updateTitle()
-                    callback(api:Get())
-                end
-
-                function api:Clear()
-                    selections = isMulti and {} or nil
-                    allOptions = {}
-                    clearOptions()
-                    updateTitle()
-                    callback(api:Get())
-                end
-
-                function api:Refresh(newOpts)
-                    if newOpts then allOptions = table.clone(newOpts) end
-                    refreshOptions(SearchBox.Text)
-                    updateTitle()
-                    callback(api:Get())
-                end
-
-                function api:GetOptions()
-                    return table.clone(allOptions)
-                end
-
                 return api
             end
+
 
             function main:Textbox(text, placeholder, callback)
                 local Textbox = Instance.new("Frame")
