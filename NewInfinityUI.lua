@@ -2475,10 +2475,13 @@ if IKAI then
                 end
 
                 function api:Refresh(newOpts)
-                    if newOpts then allOptions = table.clone(newOpts) end
-                    refreshOptions(SearchBox.Text)
-                    updateTitle()
-                    callback(api:Get())
+                    if newOpts then
+                        assert(typeof(newOpts) == "table", "newOpts must be a table")
+                        allOptions = table.clone(newOpts)
+                    end
+                    if isDropped then
+                        refreshOptions(SearchBox.Text)
+                    end
                 end
 
                 function api:GetOptions()
@@ -2487,7 +2490,6 @@ if IKAI then
 
                 return api
             end
-
 
             function main:Textbox(text, placeholder, callback)
                 local Textbox = Instance.new("Frame")
