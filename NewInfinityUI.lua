@@ -2479,7 +2479,9 @@ if IKAI then
                         assert(typeof(newOpts) == "table", "newOpts must be a table")
                         allOptions = table.clone(newOpts)
                     end
-                    refreshOptions("")
+                    if isDropped then
+                        refreshOptions(SearchBox.Text)
+                    end
                 end
 
                 function api:GetOptions()
