@@ -329,9 +329,42 @@ if IKAI then
         )
     end
     
+    local function gradient(text, colors)
+        local colors = colors
+        if #colors == 0 then
+            return text
+        end
+        if #colors == 1 then
+            local color = colors[1]
+            local r = math.floor(color.R * 255)
+            local g = math.floor(color.G * 255)
+            local b = math.floor(color.B * 255)
+            return string.format('<font color="rgb(%d,%d,%d)">%s</font>', r, g, b, text)
+        end
+        local result = ""
+        local segments = #colors - 1
+        local charsPerSegment = (#text - 1) / segments
+        
+        for i = 1, #text do
+            local position = (i - 1) / (#text - 1)
+            local segment = math.min(math.floor(position * segments), segments - 1)
+            local segmentStart = segment / segments
+            local segmentEnd = (segment + 1) / segments
+            local t = (position - segmentStart) / (segmentEnd - segmentStart)
+            local startColor = colors[segment + 1]
+            local endColor = colors[segment + 2]
+            local r = math.floor((startColor.R + (endColor.R - startColor.R) * t) * 255)
+            local g = math.floor((startColor.G + (endColor.G - startColor.G) * t) * 255)
+            local b = math.floor((startColor.B + (endColor.B - startColor.B) * t) * 255)
+            result = result .. string.format('<font color="rgb(%d,%d,%d)">%s</font>', r, g, b, text:sub(i, i))
+        end
+        return result
+    end
+
     library = {}
     
-    function library:Window(text, logo, keybind)
+    function library:Window(text, logo, keybind, gradientText, accentColor)
+		if accentColor then _G.Accent = accentColor end
         local uihide = false
         local abc = false
         local logo = logo or 0
@@ -389,7 +422,6 @@ if IKAI then
         TCNR.CornerRadius = UDim.new(0, 8)
         TCNR.Parent = Top
 
-        
         local Name = Instance.new("TextLabel")
         Name.Name = "Name"
         Name.Parent = Top
@@ -397,12 +429,13 @@ if IKAI then
         Name.Position = UDim2.new(0, isMobileLayout and 10 or 20, 0, 0)
         Name.Size = UDim2.new(0, isMobileLayout and 150 or 200, 1, 0)
         Name.Font = Enum.Font.GothamSemibold
-        Name.Text = isMobileLayout and "Project WD" or text
+        Name.Text = text
         Name.TextColor3 = _G.TextPrimary
         Name.TextSize = isMobileLayout and 14 or 16
         Name.TextXAlignment = Enum.TextXAlignment.Left
+		Name.RichText = true
+        Name.Text = gradient(text, gradientText)
 
-        
         local BindButton = Instance.new("TextButton")
         BindButton.Name = "BindButton"
         BindButton.Parent = Top
@@ -2684,7 +2717,9 @@ if IKAI then
                 Label.Text = text
                 Label.TextColor3 = _G.TextSecondary
                 Label.TextSize = isMobileLayout and 10 or 12
-
+                Label.RichText = true
+                Label.Text = gradient(text, gradientText)
+                
                 local Line2 = Instance.new("Frame")
                 Line2.Name = "Line2"
                 Line2.Parent = Seperator
@@ -2699,4 +2734,5 @@ if IKAI then
         return uitab
     end
 end
+
 return library
