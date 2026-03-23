@@ -1198,6 +1198,7 @@ if IKAI then
                         end
                     end)
                 end)
+                
             end
 
             function main:RichParagraph(text, options)
@@ -1515,10 +1516,10 @@ if IKAI then
                     
                     
                     local iconMap = {
-                        info = "rbxassetid://3944680095",
-                        success = "rbxassetid://3944680152", 
-                        warning = "rbxassetid://3944680123",
-                        error = "rbxassetid://3944680107"
+                        info = "rbxassetid://10723415903",
+                        success = "rbxassetid://10709790644", 
+                        warning = "rbxassetid://10709753149",
+                        error = "rbxassetid://10747384394"
                     }
                     Icon.Image = config.Image or iconMap[config.Type] or iconMap.info
                     
@@ -2704,35 +2705,36 @@ if IKAI then
                 Line1.Parent = Seperator
                 Line1.BackgroundColor3 = _G.Border
                 Line1.BorderSizePixel = 0
+                Line1.AnchorPoint = Vector2.new(0, 0.5)
                 Line1.Position = UDim2.new(0, 0, 0.5, 0)
-                Line1.Size = UDim2.new(0, isMobileLayout and 80 or 120, 0, 1)
+                Line1.Size = UDim2.new(0.4, -10, 0, 1)
 
                 local Label = Instance.new("TextLabel")
                 Label.Name = "Label"
                 Label.Parent = Seperator
                 Label.BackgroundTransparency = 1
-                Label.Position = UDim2.new(0, isMobileLayout and 85 or 130, 0, 0)
-                Label.Size = UDim2.new(0, isMobileLayout and 100 or 130, 1, 0)
+                Label.AnchorPoint = Vector2.new(0.5, 0)
+                Label.Position = UDim2.new(0.5, 0, 0, 0)
+                Label.Size = UDim2.new(0, isMobileLayout and 100 or 140, 1, 0)
                 Label.Font = Enum.Font.GothamMedium
                 Label.Text = text
                 Label.TextColor3 = _G.TextSecondary
                 Label.TextSize = isMobileLayout and 10 or 12
                 Label.RichText = true
                 Label.Text = gradient(text, gradientText)
-                
+
                 local Line2 = Instance.new("Frame")
                 Line2.Name = "Line2"
                 Line2.Parent = Seperator
                 Line2.BackgroundColor3 = _G.Border
                 Line2.BorderSizePixel = 0
-                Line2.Position = UDim2.new(0, isMobileLayout and 190 or 270, 0.5, 0)
-                Line2.Size = UDim2.new(0, isMobileLayout and 80 or 120, 0, 1)
+                Line2.AnchorPoint = Vector2.new(1, 0.5)
+                Line2.Position = UDim2.new(1, 0, 0.5, 0)
+                Line2.Size = UDim2.new(0.4, -10, 0, 1)
             end
-
             return main
         end
         return uitab
     end
 end
-
 return library
