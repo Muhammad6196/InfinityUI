@@ -914,14 +914,15 @@ if IKAI then
                 local ButtonObject = {}
 
                 function ButtonObject:Set(newText, newCallback)
-                    if newText then
-                        ButtonText.Text = newText
-                    end
-                    if newCallback then
-                        callback = newCallback
-                    end
-                    return ButtonObject
-                end
+					if newText then
+						ButtonText.Text = newText
+						Button.Text = newText
+					end
+					if newCallback then
+						callback = newCallback
+					end
+					return ButtonObject
+				end
 
                 function ButtonObject:SetColor(color)
                     ButtonText.TextColor3 = color
