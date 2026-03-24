@@ -1201,7 +1201,7 @@ if IKAI then
                 
             end
 
-            function main:RichParagraph(text, options)
+            function main:RichParagraph(text, options, color)
                 local options = options or {}
                 local textSize = options.TextSize or (isMobileLayout and 11 or 13)
                 local lineHeight = options.LineHeight or 1.3
@@ -1219,6 +1219,34 @@ if IKAI then
                 Paragraph.Size = UDim2.new(0, elementWidth, 0, 0)
                 Paragraph.ClipsDescendants = true
 
+                -- 🔥 Auto color / gradient detection
+                if color then
+                    if typeof(color) == "Color3" then
+                        Paragraph.BackgroundColor3 = color
+
+                    elseif typeof(color) == "table" then
+                        local Gradient = Instance.new("UIGradient")
+                        Gradient.Parent = Paragraph
+                        Paragraph.BackgroundColor3 = Color3.new(1, 1, 1)
+                        local keypoints = {}
+                        for i, col in ipairs(color) do
+                            local alpha = (#color > 1) and ((i - 1) / (#color - 1)) or 0
+                            table.insert(keypoints, ColorSequenceKeypoint.new(alpha, col))
+                        end
+
+                        Gradient.Color = ColorSequence.new(keypoints)
+                        Gradient.Rotation = options.GradientRotation or 90
+                        Paragraph.BackgroundTransparency = 0
+
+                    elseif typeof(color) == "ColorSequence" then
+                        local Gradient = Instance.new("UIGradient")
+                        Gradient.Parent = Paragraph
+                        Gradient.Color = color
+                        Gradient.Rotation = options.GradientRotation or 90
+                        Paragraph.BackgroundTransparency = 0
+                    end
+                end
+
                 local ParagraphCorner = Instance.new("UICorner")
                 ParagraphCorner.CornerRadius = UDim.new(0, 6)
                 ParagraphCorner.Parent = Paragraph
@@ -1228,7 +1256,6 @@ if IKAI then
                 ParagraphStroke.Color = _G.Border
                 ParagraphStroke.Thickness = 1
 
-                
                 local ScrollFrame = Instance.new("ScrollingFrame")
                 ScrollFrame.Name = "ScrollFrame"
                 ScrollFrame.Parent = Paragraph
@@ -1266,35 +1293,29 @@ if IKAI then
                 UIListLayout.Parent = TextContainer
                 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-                
                 local function updateSize()
                     task.wait(0.1)
-                    
+
                     local textBounds = ParagraphText.TextBounds
                     local padding = isMobileLayout and 20 or 30
                     local requiredHeight = math.max(textBounds.Y + padding, isMobileLayout and 50 or 60)
-                    
-                    
+
                     local finalHeight = math.min(requiredHeight, maxHeight)
-                    
+
                     ParagraphText.Size = UDim2.new(1, 0, 0, textBounds.Y)
                     TextContainer.Size = UDim2.new(1, 0, 0, textBounds.Y)
-                    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, textBounds.Y + (isMobileLayout and 20 or 30))
+                    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, textBounds.Y + padding)
                     Paragraph.Size = UDim2.new(0, elementWidth, 0, finalHeight)
-                    
-                    
+
                     ScrollFrame.ScrollBarThickness = requiredHeight > maxHeight and (isMobileLayout and 4 or 3) or 0
                 end
 
-                
                 updateSize()
 
-                
                 ParagraphText:GetPropertyChangedSignal("Text"):Connect(updateSize)
                 ParagraphText:GetPropertyChangedSignal("TextSize"):Connect(updateSize)
                 ParagraphText:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateSize)
 
-                
                 local ParagraphAPI = {}
 
                 function ParagraphAPI:Set(newText)
@@ -1352,7 +1373,30 @@ if IKAI then
                     return ParagraphAPI
                 end
 
-                
+                -- 🔥 Optional gradient control API
+                function ParagraphAPI:SetGradient(colorInput, rotation)
+                    local existing = Paragraph:FindFirstChildOfClass("UIGradient")
+                    if not existing then
+                        existing = Instance.new("UIGradient")
+                        existing.Parent = Paragraph
+                    end
+
+                    if typeof(colorInput) == "ColorSequence" then
+                        existing.Color = colorInput
+                    elseif typeof(colorInput) == "table" then
+                        local keypoints = {}
+                        for i, col in ipairs(colorInput) do
+                            local alpha = (#colorInput > 1) and ((i - 1) / (#colorInput - 1)) or 0
+                            table.insert(keypoints, ColorSequenceKeypoint.new(alpha, col))
+                        end
+                        existing.Color = ColorSequence.new(keypoints)
+                    end
+
+                    existing.Rotation = rotation or existing.Rotation
+                    Paragraph.BackgroundTransparency = 0
+                    return ParagraphAPI
+                end
+
                 function ParagraphAPI:AddHeader(text, level)
                     level = level or 1
                     local headerSize = (isMobileLayout and 14 or 16) - (level - 1) * 2
@@ -1362,8 +1406,7 @@ if IKAI then
                 end
 
                 function ParagraphAPI:AddListItem(text)
-                    local listItem = "\n• "..text
-                    ParagraphText.Text = ParagraphText.Text .. listItem
+                    ParagraphText.Text = ParagraphText.Text .. "\n• " .. text
                     return ParagraphAPI
                 end
 
@@ -1378,26 +1421,22 @@ if IKAI then
                 end
 
                 function ParagraphAPI:AddCode(text)
-                    local codeText = "\n<font color=\"#60A5FA\">`"..text.."`</font>"
-                    ParagraphText.Text = ParagraphText.Text .. codeText
+                    ParagraphText.Text = ParagraphText.Text .. "\n<font color=\"#60A5FA\">`"..text.."`</font>"
                     return ParagraphAPI
                 end
 
                 function ParagraphAPI:AddWarning(text)
-                    local warningText = "\n<font color=\"#FBBF24\">⚠ "..text.."</font>"
-                    ParagraphText.Text = ParagraphText.Text .. warningText
+                    ParagraphText.Text = ParagraphText.Text .. "\n<font color=\"#FBBF24\">⚠ "..text.."</font>"
                     return ParagraphAPI
                 end
 
                 function ParagraphAPI:AddSuccess(text)
-                    local successText = "\n<font color=\"#34D399\">✓ "..text.."</font>"
-                    ParagraphText.Text = ParagraphText.Text .. successText
+                    ParagraphText.Text = ParagraphText.Text .. "\n<font color=\"#34D399\">✓ "..text.."</font>"
                     return ParagraphAPI
                 end
 
                 function ParagraphAPI:AddError(text)
-                    local errorText = "\n<font color=\"#F87171\">✗ "..text.."</font>"
-                    ParagraphText.Text = ParagraphText.Text .. errorText
+                    ParagraphText.Text = ParagraphText.Text .. "\n<font color=\"#F87171\">✗ "..text.."</font>"
                     return ParagraphAPI
                 end
 
