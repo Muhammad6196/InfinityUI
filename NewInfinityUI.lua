@@ -641,7 +641,7 @@ if IKAI then
         PLL.Name = "PLL"
         PLL.Parent = ScrollTab
         PLL.SortOrder = Enum.SortOrder.LayoutOrder
-        PLL.Padding = UDim.new(0, isMobileLayout and 2 or 4)
+        PLL.Padding = UDim.new(0, isMobileLayout and 6 or 8)
         PLL.HorizontalAlignment = "Center"
         
         local PPD = Instance.new("UIPadding")
@@ -708,6 +708,31 @@ if IKAI then
             TabButton.TextColor3 = _G.TextSecondary
             TabButton.TextSize = isMobileLayout and 11 or 14
             TabButton.AutoButtonColor = false
+
+            local TweenService = game:GetService("TweenService")
+
+            local hoverTween = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+            TabButton.MouseEnter:Connect(function()
+                TweenService:Create(TabButton, hoverTween, {
+                    BackgroundTransparency = 0.7,
+                    TextColor3 = _G.TextPrimary
+                }):Play()
+            end)
+
+            TabButton.MouseLeave:Connect(function()
+                TweenService:Create(TabButton, hoverTween, {
+                    BackgroundTransparency = 0.9,
+                    TextColor3 = _G.TextSecondary
+                }):Play()
+            end)
+
+            local Stroke = Instance.new("UIStroke")
+            Stroke.Parent = TabButton
+            Stroke.Color = _G.Border
+            Stroke.Thickness = 1
+            Stroke.Transparency = 0
+            Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
             local TabCorner = Instance.new("UICorner")
             TabCorner.CornerRadius = UDim.new(0, 6)
