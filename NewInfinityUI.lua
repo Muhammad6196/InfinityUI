@@ -715,14 +715,12 @@ if IKAI then
 
             TabButton.MouseEnter:Connect(function()
                 TweenService:Create(TabButton, hoverTween, {
-                    BackgroundTransparency = 0.7,
                     TextColor3 = _G.TextPrimary
                 }):Play()
             end)
 
             TabButton.MouseLeave:Connect(function()
                 TweenService:Create(TabButton, hoverTween, {
-                    BackgroundTransparency = 0.9,
                     TextColor3 = _G.TextSecondary
                 }):Play()
             end)
