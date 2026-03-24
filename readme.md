@@ -508,4 +508,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 [![Discord](https://img.shields.io/badge/Join_Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/88gR5XUpkC)
 
 </div>
-```
+
