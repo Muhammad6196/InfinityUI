@@ -32,7 +32,7 @@ Discord: https://discord.gg/88gR5XUpkC
 
 ```lua
 -- Load the library
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/your-repo/project-wd/main/source.lua"))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Muhammad6196/InfinityUI/refs/heads/main/NewInfinityUI.lua"))()
 
 -- Create a window
 local Window = library:Window("Project WD", nil, Enum.KeyCode.RightControl, {
