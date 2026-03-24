@@ -3,8 +3,6 @@ Here's the complete README.md in a single file that you can copy and paste:
 ```markdown
 # 🎨 Project WD UI Library
 
-<div align="center">
-  
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Roblox](https://img.shields.io/badge/Roblox-UI-red)
@@ -12,8 +10,6 @@ Here's the complete README.md in a single file that you can copy and paste:
 A modern, responsive UI library for Roblox exploits with shadcn/ui-inspired design aesthetics.
 
 [![Discord](https://img.shields.io/badge/Discord-Join-7289DA)](https://discord.gg/88gR5XUpkC)
-
-</div>
 
 ---
 
