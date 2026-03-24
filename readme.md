@@ -1,5 +1,3 @@
-Here's the complete README.md in a single file that you can copy and paste:
-
 ```markdown
 🎨 Project WD UI Library
 
