@@ -1436,7 +1436,8 @@ if IKAI then
 				    Icon.BackgroundTransparency = 1
 				    Icon.Size = UDim2.new(0, 16, 0, 16)
 				    Icon.Image = iconId
-				
+					Icon.ImageColor3 = color
+					
 				    local Label = Instance.new("TextLabel")
 				    Label.Parent = Row
 				    Label.BackgroundTransparency = 1
@@ -1458,7 +1459,7 @@ if IKAI then
                 end
 
                 function ParagraphAPI:AddListItem(text)
-				    createIconRow("rbxassetid://10709797837", text)
+				    createIconRow("rbxassetid://10723343537", text)
 				    return ParagraphAPI
 				end
 
@@ -1483,12 +1484,12 @@ if IKAI then
 				end
 
                 function ParagraphAPI:AddSuccess(text)
-				    createIconRow("rbxassetid://10709790387", text, Color3.fromRGB(52,211,153))
+				    createIconRow("rbxassetid://10709790644", text, Color3.fromRGB(52,211,153))
 				    return ParagraphAPI
 				end
 
                 function ParagraphAPI:AddError(text)
-				    createIconRow("rbxassetid://10747383819", text, Color3.fromRGB(248,113,113))
+				    createIconRow("rbxassetid://10747384394", text, Color3.fromRGB(248,113,113))
 				    return ParagraphAPI
 				end
 
