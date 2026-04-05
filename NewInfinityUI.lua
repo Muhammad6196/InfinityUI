@@ -1419,37 +1419,7 @@ if IKAI then
                     Paragraph.BackgroundTransparency = 0
                     return ParagraphAPI
                 end
-				local function createIconRow(iconId, text, color)
-				    local Row = Instance.new("Frame")
-				    Row.Parent = TextContainer
-				    Row.BackgroundTransparency = 1
-				    Row.Size = UDim2.new(1, 0, 0, 20)
-				
-				    local Layout = Instance.new("UIListLayout")
-				    Layout.Parent = Row
-				    Layout.FillDirection = Enum.FillDirection.Horizontal
-				    Layout.VerticalAlignment = Enum.VerticalAlignment.Center
-				    Layout.Padding = UDim.new(0, 6)
-				
-				    local Icon = Instance.new("ImageLabel")
-				    Icon.Parent = Row
-				    Icon.BackgroundTransparency = 1
-				    Icon.Size = UDim2.new(0, 16, 0, 16)
-				    Icon.Image = iconId
-					Icon.ImageColor3 = color
-					
-				    local Label = Instance.new("TextLabel")
-				    Label.Parent = Row
-				    Label.BackgroundTransparency = 1
-				    Label.Size = UDim2.new(1, -20, 1, 0)
-				    Label.Font = Enum.Font.Gotham
-				    Label.Text = text
-				    Label.TextColor3 = color or ParagraphText.TextColor3
-				    Label.TextSize = textSize
-				    Label.TextXAlignment = Enum.TextXAlignment.Left
-				
-				    return Row
-				end
+
                 function ParagraphAPI:AddHeader(text, level)
                     level = level or 1
                     local headerSize = (isMobileLayout and 14 or 16) - (level - 1) * 2
@@ -1459,9 +1429,9 @@ if IKAI then
                 end
 
                 function ParagraphAPI:AddListItem(text)
-				    createIconRow("rbxassetid://10723343537", text)
-				    return ParagraphAPI
-				end
+                    ParagraphText.Text = ParagraphText.Text .. "\n• " .. text
+                    return ParagraphAPI
+                end
 
                 function ParagraphAPI:AddLineBreak()
                     ParagraphText.Text = ParagraphText.Text .. "\n"
@@ -1479,19 +1449,19 @@ if IKAI then
                 end
 
                 function ParagraphAPI:AddWarning(text)
-				    createIconRow("rbxassetid://10709753149", text, Color3.fromRGB(251,191,36))
-				    return ParagraphAPI
-				end
+                    ParagraphText.Text = ParagraphText.Text .. "\n<font color=\"#FBBF24\">⚠ "..text.."</font>"
+                    return ParagraphAPI
+                end
 
                 function ParagraphAPI:AddSuccess(text)
-				    createIconRow("rbxassetid://10709790644", text, Color3.fromRGB(52,211,153))
-				    return ParagraphAPI
-				end
+                    ParagraphText.Text = ParagraphText.Text .. "\n<font color=\"#34D399\">✓ "..text.."</font>"
+                    return ParagraphAPI
+                end
 
                 function ParagraphAPI:AddError(text)
-				    createIconRow("rbxassetid://10747384394", text, Color3.fromRGB(248,113,113))
-				    return ParagraphAPI
-				end
+                    ParagraphText.Text = ParagraphText.Text .. "\n<font color=\"#F87171\">✗ "..text.."</font>"
+                    return ParagraphAPI
+                end
 
                 return ParagraphAPI
             end
