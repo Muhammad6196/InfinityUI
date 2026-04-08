@@ -1459,7 +1459,7 @@ if IKAI then
                 end
 
                 function ParagraphAPI:AddError(text)
-                    ParagraphText.Text = ParagraphText.Text .. "\n<font color=\"#F87171\">✗ "..text.."</font>"
+                    ParagraphText.Text = ParagraphText.Text .. "\n<font color=\"#F87171\">✖ "..text.."</font>"
                     return ParagraphAPI
                 end
 
